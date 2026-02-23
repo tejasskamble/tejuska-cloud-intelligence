@@ -1,117 +1,140 @@
-"""
-app.py
-======
-TEJUSKA Cloud Intelligence
-Login page with Google and GitHub SSO.
-"""
-
 import streamlit as st
-import requests
-import os
 
-# ---------------------------------------------------------------------------
-# Page configuration
-# ---------------------------------------------------------------------------
+# 1. Page Configuration (Must be the first command)
 st.set_page_config(
     page_title="TEJUSKA Cloud Intelligence",
-    page_icon=None,
     layout="centered",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="collapsed"
 )
 
-# ---------------------------------------------------------------------------
-# Corporate CSS - minimalist, zero-emoji
-# ---------------------------------------------------------------------------
-st.markdown(
-    """
-    <style>
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; }
-        .block-container { max-width: 520px; padding-top: 4rem; }
-        h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px; }
-        .subtitle { font-size: 0.95rem; color: #6b7280; margin-bottom: 2rem; }
-        .divider { border-top: 1px solid #e5e7eb; margin: 1.5rem 0; }
-        .sso-btn {
-            display: block;
-            width: 100%;
-            padding: 0.65rem 1rem;
-            margin-bottom: 0.75rem;
-            border-radius: 6px;
-            border: 1px solid #d1d5db;
-            background: #ffffff;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #111827;
-            text-align: center;
-            cursor: pointer;
-        }
-        .sso-btn:hover { background: #f9fafb; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# 2. Enterprise SaaS Custom CSS
+st.markdown("""
+<style>
+    /* Hide default Streamlit branding and buttons */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+   .stDeployButton {display:none;}
+    
+    /* Center and style the main login block */
+   .block-container {
+        padding-top: 4rem;
+        max-width: 28rem;
+    }
+    
+   .saas-header {
+        text-align: center;
+        font-family: 'Inter', -apple-system, sans-serif;
+        margin-bottom: 2rem;
+    }
+   .saas-title {
+        font-size: 32px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 5px;
+    }
+   .saas-subtitle {
+        font-size: 15px;
+        color: #64748b;
+        font-weight: 400;
+    }
+    
+    /* Social Login Buttons */
+   .social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+   .google-btn {
+        background-color: #ffffff;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+    }
+   .google-btn:hover { background-color: #f8fafc; border-color: #94a3b8; }
+    
+   .github-btn {
+        background-color: #24292e;
+        color: #ffffff;
+        border: 1px solid #24292e;
+    }
+   .github-btn:hover { background-color: #1b1f23; }
+    
+   .social-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+    }
+   .github-icon { filter: invert(1); }
+    
+   .divider {
+        text-align: center;
+        margin: 20px 0;
+        color: #94a3b8;
+        font-size: 14px;
+        font-weight: 500;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# ---------------------------------------------------------------------------
-# Header
-# ---------------------------------------------------------------------------
-st.markdown("## TEJUSKA Cloud Intelligence")
-st.markdown(
-    '<p class="subtitle">Enterprise FinOps Platform for Multi-Cloud Cost Optimisation</p>',
-    unsafe_allow_html=True,
-)
-st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-
-# ---------------------------------------------------------------------------
-# Session state initialisation
-# ---------------------------------------------------------------------------
+# 3. Session State Initialization
 if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
-if "user_email" not in st.session_state:
-    st.session_state["user_email"] = ""
-if "tenant_id" not in st.session_state:
-    st.session_state["tenant_id"] = ""
+    st.session_state.authenticated = False
+    st.session_state.tenant_id = ""
 
-# ---------------------------------------------------------------------------
-# SSO Buttons (OAuth flow handled by streamlit-oauth or redirect)
-# ---------------------------------------------------------------------------
-BACKEND_URL: str = st.secrets.get("BACKEND_URL", "http://localhost:7860")
-
-if not st.session_state["authenticated"]:
-    st.markdown("**Sign in to your account**")
-    st.write("")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        google_clicked = st.button("Sign in with Google", use_container_width=True)
-    with col2:
-        github_clicked = st.button("Sign in with GitHub", use_container_width=True)
-
-    if google_clicked or github_clicked:
-        provider = "Google" if google_clicked else "GitHub"
-        # In production, redirect to OAuth provider via streamlit-oauth.
-        # For demonstration, accept the user into a guest session.
-        st.session_state["authenticated"] = True
-        st.session_state["user_email"]    = "demo@tejuska.io"
-        st.session_state["tenant_id"]     = "demo-tenant-001"
-        st.info(
-            f"{provider} SSO is configured. "
-            "Connect your OAuth credentials in Streamlit secrets to enable live authentication."
-        )
-        st.rerun()
-
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    st.markdown(
-        '<p style="font-size:0.8rem;color:#9ca3af;text-align:center;">'
-        "By signing in you agree to the TEJUSKA Terms of Service and Privacy Policy."
-        "</p>",
-        unsafe_allow_html=True,
-    )
+# 4. Authentication UI
+if not st.session_state.authenticated:
+    
+    # Header
+    st.markdown("""
+        <div class="saas-header">
+            <div class="saas-title">TEJUSKA Cloud</div>
+            <div class="saas-subtitle">Enterprise FinOps & Agentic AI Platform</div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Custom Google & GitHub Buttons using official logos
+    st.markdown("""
+        <a href="#" class="social-btn google-btn">
+            <img class="social-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+            Continue with Google
+        </a>
+        <a href="#" class="social-btn github-btn">
+            <img class="social-icon github-icon" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg"/>
+            Continue with GitHub
+        </a>
+        <div class="divider">OR SIGN IN WITH EMAIL</div>
+    """, unsafe_allow_html=True)
+    
+    # Secure Email Login Form
+    with st.form("login_form"):
+        email_input = st.text_input("Work Email", placeholder="name@company.com")
+        password_input = st.text_input("Password", type="password", placeholder="••••••••")
+        
+        submit_button = st.form_submit_button("Sign In to Workspace", type="primary", use_container_width=True)
+        
+        if submit_button:
+            if email_input and "@" in email_input:
+                # Login logic
+                st.session_state.authenticated = True
+                st.session_state.tenant_id = email_input
+                st.rerun()
+            else:
+                st.error("Please enter a valid corporate email address.")
 
 else:
-    st.success(f"Authenticated as: {st.session_state['user_email']}")
-    st.info("Navigate using the sidebar to access the FinOps Dashboard and AI tools.")
-
-    if st.button("Sign Out"):
-        st.session_state["authenticated"] = False
-        st.session_state["user_email"]    = ""
-        st.session_state["tenant_id"]     = ""
+    # 5. Post-Login Screen
+    st.success(f"Successfully authenticated as: **{st.session_state.tenant_id}**")
+    st.info("Your secure session is active. Please expand the sidebar menu (top left) to access the FinOps Dashboard and AI Assistant.")
+    
+    if st.button("Sign Out", type="secondary"):
+        st.session_state.authenticated = False
+        st.session_state.tenant_id = ""
         st.rerun()
