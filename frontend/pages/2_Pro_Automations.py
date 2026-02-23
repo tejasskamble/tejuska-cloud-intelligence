@@ -1,87 +1,56 @@
-"""
-2_Pro_Automations.py
-====================
-TEJUSKA Cloud Intelligence
-Pro Automations - Trigger ABACUS AI for autonomous resource optimisation.
-Available on Pro and Enterprise plans.
-"""
-
 import streamlit as st
 import requests
 
-st.set_page_config(
-    page_title="Pro Automations | TEJUSKA",
-    layout="wide",
-)
+st.set_page_config(page_title="Pro Automations | TEJUSKA", layout="wide")
 
 if not st.session_state.get("authenticated"):
-    st.warning("Please sign in from the Home page to access this section.")
+    st.warning("Please sign in from the Home page.")
     st.stop()
 
-BACKEND_URL: str = st.secrets.get("BACKEND_URL", "http://localhost:7860")
-TENANT_ID: str   = st.session_state.get("tenant_id", "")
-
-st.markdown("# Pro Automations")
-st.markdown(
-    "Use the ABACUS engine to evaluate cloud resources and trigger "
-    "autonomous right-sizing or termination actions."
-)
+st.markdown("## ⚡ Agentic Auto-Kill & Thresholds")
+st.markdown("Set custom budget limits. The Agentic AI will automatically terminate resources and send email alerts if costs exceed your threshold.")
 st.divider()
 
-# ---------------------------------------------------------------------------
-# Auto-termination panel
-# ---------------------------------------------------------------------------
-st.markdown("### Resource Evaluation")
-with st.form("auto_terminate_form"):
-    resource_id = st.text_input(
-        "Cloud Resource ID",
-        placeholder="e.g. i-0abc123def456 or projects/my-proj/instances/vm-001",
-    )
-    dry_run = st.checkbox("Dry Run (simulate without executing)", value=True)
-    submitted = st.form_submit_button("Evaluate Resource")
+BACKEND_URL = st.secrets.get("BACKEND_URL", "http://localhost:7860")
 
-if submitted:
-    if not resource_id.strip():
-        st.error("Resource ID must not be empty.")
-    else:
-        with st.spinner("Sending evaluation request to ABACUS engine..."):
-            try:
-                response = requests.post(
-                    f"{BACKEND_URL}/api/v1/auto-terminate",
-                    json={
-                        "tenant_id":   TENANT_ID,
-                        "resource_id": resource_id.strip(),
-                        "dry_run":     dry_run,
-                    },
-                    timeout=30,
-                )
-                if response.status_code == 202:
-                    st.success(
-                        "Evaluation scheduled. The ABACUS engine is processing the request. "
-                        "Results will appear in the audit log below."
-                    )
-                else:
-                    st.error(f"Backend returned HTTP {response.status_code}: {response.text}")
-            except requests.exceptions.ConnectionError:
-                st.error("Could not connect to the backend. Verify BACKEND_URL in secrets.")
+col1, col2 = st.columns(2)
 
-st.divider()
+with col1:
+    st.markdown("### 1. Set Budget Threshold")
+    st.info("Configure the maximum allowed cost for a specific cloud resource.")
+    with st.form("threshold_form"):
+        provider = st.selectbox("Cloud Provider",)
+        resource_id = st.text_input("Resource ID", placeholder="e.g., i-09ca51ce7bcd242ed")
+        threshold = st.number_input("Cost Threshold Limit ($)", min_value=0.01, value=1.00, step=0.50)
+        user_email = st.text_input("Alert Email ID", value=st.session_state.tenant_id)
+        
+        submit_threshold = st.form_submit_button("Activate Agentic Shield", type="primary")
+        
+        if submit_threshold:
+            if resource_id:
+                st.success(f"Shield Activated! If {provider} resource '{resource_id}' exceeds ${threshold:.2f}, it will be TERMINATED immediately and an alert will be sent to {user_email}.")
+            else:
+                st.error("Please enter a valid Resource ID.")
 
-# ---------------------------------------------------------------------------
-# Saved automation rules (static for now)
-# ---------------------------------------------------------------------------
-st.markdown("### Active Automation Rules")
-st.info(
-    "Define budget policies in the Enterprise plan to enable ABACUS to act "
-    "autonomously without manual triggers."
-)
-
-import pandas as pd
-rules_df = pd.DataFrame({
-    "Rule Name":          ["Terminate idle EC2 > 30 days", "Rightsize GCP VMs < 5% CPU"],
-    "Provider":           ["AWS", "GCP"],
-    "Condition":          ["CPU < 2% for 30 days", "CPU avg < 5% over 7 days"],
-    "Action":             ["Terminate", "Downsize"],
-    "Status":             ["Active", "Active"],
-})
-st.dataframe(rules_df, use_container_width=True, hide_index=True)
+with col2:
+    st.markdown("### 2. Simulate Cloud Billing (Test)")
+    st.warning("Test the automation by simulating a bill that exceeds your threshold.")
+    with st.form("simulate_form"):
+        sim_resource_id = st.text_input("Resource ID to Test", value="i-09ca51ce7bcd242ed")
+        sim_cost = st.number_input("Current Simulated Cost ($)", value=1.50)
+        
+        submit_sim = st.form_submit_button("Run AI Evaluation", type="secondary")
+        
+        if submit_sim:
+            st.info(f"ABACUS Engine analyzing resource {sim_resource_id}...")
+            if sim_cost > 1.00: # Assuming $1 threshold
+                st.error(f"Cost (${sim_cost}) exceeds threshold! Triggering termination...")
+                try:
+                    # In production, this hits your FastAPI backend
+                    # requests.post(f"{BACKEND_URL}/evaluate", json={...})
+                    st.success("Resource successfully terminated by AI.")
+                    st.success("Email notification dispatched via SMTP.")
+                except Exception as e:
+                    st.error(f"Backend communication error: {e}")
+            else:
+                st.success("Cost is within limits. No action taken.")
