@@ -24,7 +24,7 @@ with col1:
     st.info("Configure the maximum allowed cost for a specific cloud resource.")
     with st.form("threshold_form"):
         # EXACT FIX: Added the missing list of cloud providers!
-        provider = st.selectbox("Cloud Provider",)
+        provider = st.selectbox("Cloud Provider","Azure","GCP")
         resource_id = st.text_input("Resource ID", placeholder="e.g., i-09ca51ce7bcd242ed")
         threshold = st.number_input("Cost Threshold Limit ($)", min_value=0.01, value=1.00, step=0.50)
         
