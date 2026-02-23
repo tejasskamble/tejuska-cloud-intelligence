@@ -6,34 +6,62 @@ if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page.")
     st.stop()
 
-st.markdown("## Cloud Integration Hub")
+st.markdown("## 🔗 Multi-Cloud Integration Hub")
 st.markdown("Securely connect your AWS, Azure, and GCP environments to enable autonomous FinOps governance.")
 st.divider()
 
-col1, col2 = st.columns(2)
+# --- Status Dashboard ---
+st.markdown("### Active Connections Status")
+col_a, col_b, col_c = st.columns(3)
+with col_a:
+    if st.session_state.get("aws_connected"):
+        st.success("AWS: Active 🟢")
+    else:
+        st.error("AWS: Disconnected 🔴")
+with col_b:
+    if st.session_state.get("azure_connected"):
+        st.success("Azure: Active 🟢")
+    else:
+        st.error("Azure: Disconnected 🔴")
+with col_c:
+    if st.session_state.get("gcp_connected"):
+        st.success("GCP: Active 🟢")
+    else:
+        st.error("GCP: Disconnected 🔴")
+
+st.divider()
+
+# --- Connection Forms ---
+col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.markdown("### AWS Connection")
+    st.markdown("#### AWS Connection")
     with st.form("aws_connect_form"):
-        aws_access_key = st.text_input("AWS Access Key ID", type="password")
-        aws_secret_key = st.text_input("AWS Secret Access Key", type="password")
-        aws_region = st.selectbox("Default Region", ["ap-south-1 (Mumbai)", "us-east-1 (N. Virginia)", "eu-central-1 (Frankfurt)"])
-        
-        submit_aws = st.form_submit_button("Connect AWS Account", type="primary", use_container_width=True)
-        
-        if submit_aws:
-            if len(aws_access_key) > 5 and len(aws_secret_key) > 5:
-                st.success("AWS Account successfully linked and authenticated.")
-                st.session_state["aws_connected"] = True
-            else:
-                st.error("Please provide valid AWS credentials.")
+        aws_access_key = st.text_input("Access Key ID", type="password")
+        aws_secret_key = st.text_input("Secret Access Key", type="password")
+        aws_region = st.selectbox("Region", ["ap-south-1 (Mumbai)", "us-east-1 (N. Virginia)"])
+        submit_aws = st.form_submit_button("Connect AWS", type="primary", use_container_width=True)
+        if submit_aws and aws_access_key:
+            st.session_state["aws_connected"] = True
+            st.rerun()
 
 with col2:
-    st.markdown("### Active Connections Status")
-    if st.session_state.get("aws_connected"):
-        st.success("Amazon Web Services: STATUS ACTIVE (Syncing Billing Data)")
-    else:
-        st.info("Amazon Web Services: Disconnected")
-        
-    st.info("Microsoft Azure: Disconnected")
-    st.info("Google Cloud Platform: Disconnected")
+    st.markdown("#### Azure Connection")
+    with st.form("azure_connect_form"):
+        tenant_id = st.text_input("Tenant ID", type="password")
+        client_id = st.text_input("Client ID", type="password")
+        client_secret = st.text_input("Client Secret", type="password")
+        submit_azure = st.form_submit_button("Connect Azure", type="primary", use_container_width=True)
+        if submit_azure and tenant_id:
+            st.session_state["azure_connected"] = True
+            st.rerun()
+
+with col3:
+    st.markdown("#### GCP Connection")
+    with st.form("gcp_connect_form"):
+        gcp_project = st.text_input("Project ID")
+        gcp_json = st.file_uploader("Upload Service Account JSON", type=["json"])
+        submit_gcp = st.form_submit_button("Connect GCP", type="primary", use_container_width=True)
+        if submit_gcp and gcp_project:
+            st.session_state["gcp_connected"] = True
+            st.rerun()
