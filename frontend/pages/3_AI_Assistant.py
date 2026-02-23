@@ -27,17 +27,17 @@ st.divider()
 try:
     openai.api_key = st.secrets["openai"]["api_key"]
 except:
-    st.warning("OpenAI API key not found! Using local simulation mode.")
-    openai.api_key = None
+    st.error("OpenAI API key not found in Streamlit secrets!")
+    st.stop()
 
 # ------------------------
-# 4. Initialize Chat & Threshold Session State
+# 4. Initialize Session State
 # ------------------------
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 
 if "thresholds" not in st.session_state:
-    st.session_state.thresholds = {}  # cloud resource thresholds
+    st.session_state.thresholds = {}  # Cloud resource thresholds
 
 # ------------------------
 # 5. Layout: Two Columns (Threshold + Chat)
@@ -53,9 +53,7 @@ with col1:
         provider = st.selectbox("Cloud Provider", ["AWS", "Azure", "GCP", "Other"])
         resource_id = st.text_input("Resource ID", placeholder="e.g., i-09ca51ce7bcd242ed")
         threshold = st.number_input("Cost Threshold ($)", min_value=0.01, value=1.0, step=0.5)
-        user_email = st.text_input(
-            "Alert Email", value=st.session_state.get("tenant_id", "")
-        )
+        user_email = st.text_input("Alert Email", value=st.session_state.get("tenant_id", ""))
 
         submit_threshold = st.form_submit_button("Activate Agentic Shield", type="primary")
 
@@ -74,10 +72,10 @@ with col1:
                 st.error("Enter a valid Resource ID!")
 
 # ------------------------
-# Column 2: ChatGPT Assistant
+# Column 2: Dynamic Chat Assistant
 # ------------------------
 with col2:
-    st.markdown("### 🤖 FinOps Chat Assistant")
+    st.markdown("### 🤖 FinOps Chat Assistant (GPT-style)")
 
     # Display previous messages
     for message in st.session_state.chat_messages:
@@ -91,60 +89,45 @@ with col2:
         with st.chat_message("user"):
             st.markdown(user_query)
 
-        # GPT response / fallback simulation
+        # GPT response
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
             with st.spinner("Analyzing multi-cloud metrics & FinOps insights..."):
                 try:
-                    if openai.api_key:
-                        # Prepare system + chat context
-                        system_prompt = {
-                            "role": "system",
-                            "content": (
-                                "You are an expert FinOps AI assistant. Analyze cloud costs, thresholds, "
-                                "resource utilization, and give recommendations. "
-                                "You may generate SQL queries or provide guidance for AWS, Azure, GCP resources."
-                            )
-                        }
-                        messages = [system_prompt] + st.session_state.chat_messages
-
-                        # GPT call
-                        response = openai.chat.completions.create(
-                            model="gpt-3.5-turbo",
-                            messages=messages,
-                            temperature=0.3,
-                            max_tokens=800
+                    # Prepare system + chat context
+                    system_prompt = {
+                        "role": "system",
+                        "content": (
+                            "You are an expert FinOps AI assistant. Analyze cloud costs, thresholds, "
+                            "resource utilization, and give recommendations. "
+                            "You may generate SQL queries or provide guidance for AWS, Azure, GCP resources."
                         )
-                        full_response = response.choices[0].message.content
-                    else:
-                        raise Exception("API key missing, using simulated response.")
+                    }
+
+                    messages = [system_prompt] + st.session_state.chat_messages
+
+                    # GPT API call (v1.0+ syntax)
+                    response = openai.chat.completions.create(
+                        model="gpt-3.5-turbo",  # or "gpt-4" if available
+                        messages=messages,
+                        temperature=0.3,
+                        max_tokens=800
+                    )
+
+                    full_response = response.choices[0].message.content
+
+                    # Streaming effect
+                    streamed_text = ""
+                    for word in full_response.split():
+                        streamed_text += word + " "
+                        message_placeholder.markdown(streamed_text + "▌")
+                        time.sleep(0.01)
+                    message_placeholder.markdown(full_response)
 
                 except Exception as e:
-                    # Fallback simulation
-                    lower_query = user_query.lower()
-                    if "aws" in lower_query or "ec2" in lower_query:
-                        full_response = (
-                            "Based on simulated telemetry, your AWS EC2 instances are running within "
-                            "$1 threshold. Projected monthly spend looks stable. No anomalies detected."
-                        )
-                    elif "terminate" in lower_query or "kill" in lower_query:
-                        full_response = (
-                            "Simulation: Resource termination requires exact Resource ID in 'Pro Automations' tab."
-                        )
-                    else:
-                        full_response = (
-                            f"Simulated answer: '{user_query}'. Multi-cloud architecture looks optimized. "
-                            "Consider setting automated shields for further cost control."
-                        )
-
-                # Streaming effect
-                streamed_text = ""
-                for word in full_response.split():
-                    streamed_text += word + " "
-                    message_placeholder.markdown(streamed_text + "▌")
-                    time.sleep(0.01)
-                message_placeholder.markdown(full_response)
+                    full_response = f"Error fetching GPT response: {e}"
+                    message_placeholder.markdown(full_response)
 
             # Append assistant message to session
             st.session_state.chat_messages.append(
@@ -152,7 +135,7 @@ with col2:
             )
 
 # ------------------------
-# Optional: Show Current Thresholds
+# Optional: Show Active Thresholds
 # ------------------------
 with st.expander("View Active Thresholds"):
     if st.session_state.thresholds:
