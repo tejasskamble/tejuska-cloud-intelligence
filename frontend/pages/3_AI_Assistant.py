@@ -1,7 +1,6 @@
 import streamlit as st
 import openai
 import time
-from openai.error import RateLimitError, APIError
 
 # ------------------------
 # 1. Page Configuration
@@ -128,14 +127,9 @@ with col2:
                         time.sleep(0.01)
                     message_placeholder.markdown(full_response)
 
-                except RateLimitError:
-                    full_response = "⚠ Quota exceeded! Showing fallback simulated response."
-                    message_placeholder.markdown(full_response)
-                except APIError as e:
-                    full_response = f"OpenAI API error: {e}"
-                    message_placeholder.markdown(full_response)
                 except Exception as e:
-                    full_response = f"Unexpected error: {e}"
+                    # Catch all errors safely without openai.error import
+                    full_response = f"⚠ Error fetching GPT response: {e}"
                     message_placeholder.markdown(full_response)
 
             # Append assistant message to session
