@@ -14,7 +14,7 @@ if not st.session_state.get("authenticated"):
 # ------------------------
 # 2. Header
 # ------------------------
-st.markdown("## ⚡ OPTIC FinOps AI Assistant – Infinity Ultra Pro Max")
+st.markdown("## ⚡ OPTIC FinOps AI Assistant – Quota-Safe Edition")
 st.markdown(
     "Ask anything about your cloud infrastructure costs. "
     "The Agentic AI can analyze multi-cloud metrics, generate SQL insights, and give recommendations."
@@ -77,7 +77,7 @@ with col1:
 # Column 2: ChatGPT Assistant
 # ------------------------
 with col2:
-    st.markdown("### 🤖 FinOps Chat Assistant")
+    st.markdown("### 🤖 FinOps Chat Assistant (GPT-3.5 safe)")
 
     # Display previous messages
     for message in st.session_state.chat_messages:
@@ -109,12 +109,12 @@ with col2:
 
                     messages = [system_prompt] + st.session_state.chat_messages
 
-                    # ✅ GPT-3.5 compatible
+                    # ✅ GPT-3.5 safe
                     response = openai.chat.completions.create(
                         model="gpt-3.5-turbo",
                         messages=messages,
                         temperature=0.3,
-                        max_tokens=800
+                        max_tokens=600
                     )
 
                     full_response = response.choices[0].message.content
@@ -125,6 +125,15 @@ with col2:
                         streamed_text += word + " "
                         message_placeholder.markdown(streamed_text + "▌")
                         time.sleep(0.01)
+                    message_placeholder.markdown(full_response)
+
+                except openai.error.RateLimitError:
+                    # ⚠ Quota exceed fallback
+                    full_response = (
+                        "⚠ Quota exceeded! Using fallback response.\n"
+                        "Your FinOps AI is currently running in simulation mode. "
+                        "Ask again later or check your OpenAI plan."
+                    )
                     message_placeholder.markdown(full_response)
 
                 except Exception as e:
