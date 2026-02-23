@@ -1,6 +1,6 @@
 import streamlit as st
-import openai
 import time
+import random
 
 # ------------------------
 # 1. Page Configuration
@@ -14,33 +14,24 @@ if not st.session_state.get("authenticated"):
 # ------------------------
 # 2. Header
 # ------------------------
-st.markdown("## ⚡ OPTIC FinOps AI Assistant – Infinity Ultra Pro Max")
+st.markdown("## ⚡ OPTIC FinOps AI Assistant – Infinity Ultra Pro Max (Simulated GPT)")
 st.markdown(
     "Ask anything about your cloud infrastructure costs. "
-    "The Agentic AI can analyze multi-cloud metrics, generate SQL insights, and give recommendations."
+    "This simulation responds like a ChatGPT FinOps assistant."
 )
 st.divider()
 
 # ------------------------
-# 3. OpenAI API Setup
-# ------------------------
-try:
-    openai.api_key = st.secrets["openai"]["api_key"]
-except:
-    st.error("OpenAI API key not found in Streamlit secrets!")
-    st.stop()
-
-# ------------------------
-# 4. Initialize Session State
+# 3. Initialize Session State
 # ------------------------
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 
 if "thresholds" not in st.session_state:
-    st.session_state.thresholds = {}  # Cloud resource thresholds
+    st.session_state.thresholds = {}
 
 # ------------------------
-# 5. Layout: Two Columns (Threshold + Chat)
+# 4. Layout: Two Columns (Threshold + Chat)
 # ------------------------
 col1, col2 = st.columns([1, 2])
 
@@ -72,10 +63,10 @@ with col1:
                 st.error("Enter a valid Resource ID!")
 
 # ------------------------
-# Column 2: Dynamic Chat Assistant
+# Column 2: Simulated Chat Assistant
 # ------------------------
 with col2:
-    st.markdown("### 🤖 FinOps Chat Assistant (GPT-style)")
+    st.markdown("### 🤖 FinOps Chat Assistant (Simulation Mode)")
 
     # Display previous messages
     for message in st.session_state.chat_messages:
@@ -89,50 +80,35 @@ with col2:
         with st.chat_message("user"):
             st.markdown(user_query)
 
-        # GPT response
+        # Simulated GPT-style response
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
-            with st.spinner("Analyzing multi-cloud metrics & FinOps insights..."):
-                try:
-                    # Prepare system + chat context
-                    system_prompt = {
-                        "role": "system",
-                        "content": (
-                            "You are an expert FinOps AI assistant. Analyze cloud costs, thresholds, "
-                            "resource utilization, and give recommendations. "
-                            "You may generate SQL queries or provide guidance for AWS, Azure, GCP resources."
-                        )
-                    }
 
-                    messages = [system_prompt] + st.session_state.chat_messages
+            with st.spinner("Analyzing your cloud metrics..."):
+                # Simulate processing
+                time.sleep(1)
 
-                    # GPT API call (v1.0+ syntax)
-                    response = openai.chat.completions.create(
-                        model="gpt-3.5-turbo",  # or "gpt-4" if available
-                        messages=messages,
-                        temperature=0.3,
-                        max_tokens=800
-                    )
+                # Generate dynamic GPT-style reply
+                possible_responses = [
+                    f"Simulated answer: '{user_query}'. Multi-cloud architecture looks optimized. Consider setting automated shields for further cost control.",
+                    f"Analyzing '{user_query}'... All AWS/Azure/GCP resources are within thresholds. Suggest reviewing ABACUS policies.",
+                    f"Got your query '{user_query}'. The cost projections are stable. You may want to enable automated alerts for {random.choice(['AWS', 'Azure', 'GCP'])} resources.",
+                    f"Processed '{user_query}'. Multi-cloud efficiency is high. Recommend generating SQL insights for deeper analysis."
+                ]
 
-                    full_response = response.choices[0].message.content
+                full_response = random.choice(possible_responses)
 
-                    # Streaming effect
-                    streamed_text = ""
-                    for word in full_response.split():
-                        streamed_text += word + " "
-                        message_placeholder.markdown(streamed_text + "▌")
-                        time.sleep(0.01)
-                    message_placeholder.markdown(full_response)
+                # Streaming effect like ChatGPT
+                streamed_text = ""
+                for word in full_response.split():
+                    streamed_text += word + " "
+                    message_placeholder.markdown(streamed_text + "▌")
+                    time.sleep(0.02)
+                message_placeholder.markdown(full_response)
 
-                except Exception as e:
-                    full_response = f"Error fetching GPT response: {e}"
-                    message_placeholder.markdown(full_response)
-
-            # Append assistant message to session
-            st.session_state.chat_messages.append(
-                {"role": "assistant", "content": full_response}
-            )
+            # Append simulated assistant message
+            st.session_state.chat_messages.append({"role": "assistant", "content": full_response})
 
 # ------------------------
 # Optional: Show Active Thresholds
