@@ -8,11 +8,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Connect to REAL Supabase Database (THE FOUNDER'S EXACT FIX)
+# 2. Connect to REAL Supabase Database (THE EXACT FOUNDER FIX)
 @st.cache_resource
 def init_supabase() -> Client:
     try:
-        # Fetching the exact string values from INSIDE the [api] dictionary block
+        # Fetching the exact string values using the correct keys!
         url = st.secrets["api"]
         key = st.secrets["api"]
         return create_client(url, key)
@@ -22,7 +22,7 @@ def init_supabase() -> Client:
 
 supabase = init_supabase()
 
-# 3. Enterprise SaaS Custom CSS (No Emojis)
+# 3. Enterprise SaaS Custom CSS
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
