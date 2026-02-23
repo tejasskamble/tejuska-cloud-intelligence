@@ -109,9 +109,9 @@ with col2:
 
                     messages = [system_prompt] + st.session_state.chat_messages
 
-                    # GPT response (v1.0+ syntax)
+                    # ✅ GPT-3.5 compatible
                     response = openai.chat.completions.create(
-                        model="gpt-4",
+                        model="gpt-3.5-turbo",
                         messages=messages,
                         temperature=0.3,
                         max_tokens=800
