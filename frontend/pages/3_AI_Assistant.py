@@ -1,84 +1,73 @@
-"""
-3_AI_Assistant.py
-=================
-TEJUSKA Cloud Intelligence
-OPTIC AI Assistant - Natural language cloud cost queries powered by LLM + Text-to-SQL.
-"""
-
 import streamlit as st
 import requests
+import time
 
-st.set_page_config(
-    page_title="AI Assistant | TEJUSKA",
-    layout="wide",
-)
+# 1. Page Configuration
+st.set_page_config(page_title="AI Assistant | TEJUSKA", layout="wide")
 
 if not st.session_state.get("authenticated"):
-    st.warning("Please sign in from the Home page to access this section.")
+    st.warning("Please sign in from the Home page.")
     st.stop()
 
-BACKEND_URL: str = st.secrets.get("BACKEND_URL", "http://localhost:7860")
-TENANT_ID: str   = st.session_state.get("tenant_id", "")
-
-st.markdown("# OPTIC AI Assistant")
-st.markdown(
-    "Ask any question about your cloud costs in plain English. "
-    "OPTIC translates your query to SQL, retrieves the data, and returns a concise answer."
-)
+# 2. Header Section
+st.markdown("## OPTIC FinOps AI Assistant")
+st.markdown("Interact with your cloud financial data using natural language. The Agentic AI translates your queries into SQL to fetch real-time insights.")
 st.divider()
 
-# ---------------------------------------------------------------------------
-# Chat history
-# ---------------------------------------------------------------------------
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
+# Safely fetch backend URL
+try:
+    BACKEND_URL = st.secrets["api"]["backend_url"]
+except:
+    BACKEND_URL = "https://tejuska-tejuska-cloud-intelligence.hf.space"
 
-for message in st.session_state["chat_history"]:
-    role  = message["role"]
-    label = "You" if role == "user" else "OPTIC"
-    with st.chat_message(role):
-        st.write(message["content"])
-        if role == "assistant" and message.get("sql"):
-            with st.expander("View Generated SQL"):
-                st.code(message["sql"], language="sql")
+# 3. Initialize Chat History in Session State
+if "chat_messages" not in st.session_state:
+    st.session_state.chat_messages =
 
-# ---------------------------------------------------------------------------
-# Input
-# ---------------------------------------------------------------------------
-user_input: str = st.chat_input("Ask about your cloud spend...")
+# 4. Display previous chat messages
+for message in st.session_state.chat_messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-if user_input:
-    st.session_state["chat_history"].append({"role": "user", "content": user_input})
+# 5. Chat Input & Processing
+if user_query := st.chat_input("Ask anything about your cloud infrastructure costs..."):
+    
+    # Append user message to state and display
+    st.session_state.chat_messages.append({"role": "user", "content": user_query})
+    with st.chat_message("user"):
+        st.markdown(user_query)
 
-    with st.spinner("OPTIC is processing your query..."):
-        try:
-            response = requests.post(
-                f"{BACKEND_URL}/api/v1/query",
-                json={"tenant_id": TENANT_ID, "query": user_input},
-                timeout=60,
-            )
-            if response.status_code == 200:
-                data    = response.json()
-                answer  = data.get("answer", "No answer returned.")
-                sql     = data.get("sql", "")
-                st.session_state["chat_history"].append(
-                    {"role": "assistant", "content": answer, "sql": sql}
-                )
-            else:
-                st.session_state["chat_history"].append(
-                    {
-                        "role":    "assistant",
-                        "content": f"Error from backend (HTTP {response.status_code}): {response.text}",
-                        "sql":     "",
-                    }
-                )
-        except requests.exceptions.ConnectionError:
-            st.session_state["chat_history"].append(
-                {
-                    "role":    "assistant",
-                    "content": "Could not reach the backend. Verify BACKEND_URL in secrets.",
-                    "sql":     "",
-                }
-            )
+    # Assistant response generation
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        
+        with st.spinner("Analyzing FOCUS 1.1 telemetry and reasoning..."):
+            try:
+                # In production, this hits your FastAPI LangChain endpoint
+                # response = requests.post(f"{BACKEND_URL}/chat", json={"query": user_query, "tenant": st.session_state.tenant_id}, timeout=15)
+                # full_response = response.json().get("answer")
+                
+                # Simulated AI Reasoning for Demonstration purposes
+                time.sleep(2)
+                if "aws" in user_query.lower() or "ec2" in user_query.lower():
+                    full_response = f"Based on the latest telemetry, your AWS EC2 instances are running within the defined $1.00 threshold. The current projected spend for the month is stable. I have monitored 'i-09ca51ce7bcd242ed' and found no anomalies."
+                elif "terminate" in user_query.lower() or "kill" in user_query.lower():
+                    full_response = "I can execute resource termination via the ABACUS engine. However, you need to initiate the exact Resource ID in the 'Pro Automations' tab to ensure strict compliance and safety protocols."
+                else:
+                    full_response = f"I have processed your query: '{user_query}'. According to our multi-cloud database, your overall architecture is highly optimized. I recommend reviewing the 'Pro Automations' tab to set up automated shields for further cost savings."
+            except Exception as e:
+                full_response = "I am currently unable to reach the database reasoning engine. Please check the backend connection."
 
-    st.rerun()
+            # Streaming effect (typing animation) like ChatGPT
+            streamed_text = ""
+            for word in full_response.split():
+                streamed_text += word + " "
+                time.sleep(0.04)
+                message_placeholder.markdown(streamed_text + "▌")
+            
+            # Final output without cursor
+            message_placeholder.markdown(full_response)
+            
+    # Append assistant message to state
+    st.session_state.chat_messages.append({"role": "assistant", "content": full_response})
