@@ -25,12 +25,10 @@ st.divider()
 # 3. OpenAI API Setup
 # ------------------------
 try:
-    OPENAI_API_KEY = st.secrets["openai"]["api_key"]
+    openai.api_key = st.secrets["openai"]["api_key"]
 except:
     st.error("OpenAI API key not found in Streamlit secrets!")
     st.stop()
-
-openai.api_key = OPENAI_API_KEY
 
 # ------------------------
 # 4. Initialize Chat & Threshold Session State
@@ -104,31 +102,29 @@ with col2:
                         "role": "system",
                         "content": (
                             "You are an expert FinOps AI assistant. Analyze cloud costs, thresholds, "
-                            "resource utilization, and give recommendations. You may generate SQL queries "
-                            "or provide guidance for AWS, Azure, GCP resources."
+                            "resource utilization, and give recommendations. "
+                            "You may generate SQL queries or provide guidance for AWS, Azure, GCP resources."
                         )
                     }
 
                     messages = [system_prompt] + st.session_state.chat_messages
 
-                    # GPT streaming
-                    response = openai.ChatCompletion.create(
+                    # GPT response (v1.0+ syntax)
+                    response = openai.chat.completions.create(
                         model="gpt-4",
                         messages=messages,
                         temperature=0.3,
-                        max_tokens=800,
-                        stream=True
+                        max_tokens=800
                     )
 
-                    streamed_text = ""
-                    for chunk in response:
-                        if "choices" in chunk:
-                            delta = chunk["choices"][0]["delta"].get("content", "")
-                            streamed_text += delta
-                            message_placeholder.markdown(streamed_text + "▌")
-                            time.sleep(0.01)
+                    full_response = response.choices[0].message.content
 
-                    full_response = streamed_text
+                    # Streaming effect
+                    streamed_text = ""
+                    for word in full_response.split():
+                        streamed_text += word + " "
+                        message_placeholder.markdown(streamed_text + "▌")
+                        time.sleep(0.01)
                     message_placeholder.markdown(full_response)
 
                 except Exception as e:
