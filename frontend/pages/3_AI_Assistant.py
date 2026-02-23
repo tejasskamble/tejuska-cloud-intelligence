@@ -11,7 +11,10 @@ if not st.session_state.get("authenticated"):
 
 # 2. Header Section
 st.markdown("## OPTIC FinOps AI Assistant")
-st.markdown("Interact with your cloud financial data using natural language. The Agentic AI translates your queries into SQL to fetch real-time insights.")
+st.markdown(
+    "Interact with your cloud financial data using natural language. "
+    "The Agentic AI translates your queries into SQL to fetch real-time insights."
+)
 st.divider()
 
 # Safely fetch backend URL
@@ -22,7 +25,7 @@ except:
 
 # 3. Initialize Chat History in Session State
 if "chat_messages" not in st.session_state:
-    st.session_state.chat_messages =
+    st.session_state.chat_messages = []  # ✅ initialize as empty list
 
 # 4. Display previous chat messages
 for message in st.session_state.chat_messages:
@@ -45,21 +48,41 @@ if user_query := st.chat_input("Ask anything about your cloud infrastructure cos
         with st.spinner("Analyzing FOCUS 1.1 telemetry and reasoning..."):
             try:
                 # In production, this hits your FastAPI LangChain endpoint
-                # response = requests.post(f"{BACKEND_URL}/chat", json={"query": user_query, "tenant": st.session_state.tenant_id}, timeout=15)
+                # response = requests.post(
+                #     f"{BACKEND_URL}/chat", 
+                #     json={"query": user_query, "tenant": st.session_state.tenant_id}, 
+                #     timeout=15
+                # )
                 # full_response = response.json().get("answer")
                 
-                # Simulated AI Reasoning for Demonstration purposes
+                # Simulated AI Reasoning for Demonstration
                 time.sleep(2)
-                if "aws" in user_query.lower() or "ec2" in user_query.lower():
-                    full_response = f"Based on the latest telemetry, your AWS EC2 instances are running within the defined $1.00 threshold. The current projected spend for the month is stable. I have monitored 'i-09ca51ce7bcd242ed' and found no anomalies."
-                elif "terminate" in user_query.lower() or "kill" in user_query.lower():
-                    full_response = "I can execute resource termination via the ABACUS engine. However, you need to initiate the exact Resource ID in the 'Pro Automations' tab to ensure strict compliance and safety protocols."
+                lower_query = user_query.lower()
+                if "aws" in lower_query or "ec2" in lower_query:
+                    full_response = (
+                        "Based on the latest telemetry, your AWS EC2 instances are running within "
+                        "the defined $1.00 threshold. The current projected spend for the month is stable. "
+                        "I have monitored 'i-09ca51ce7bcd242ed' and found no anomalies."
+                    )
+                elif "terminate" in lower_query or "kill" in lower_query:
+                    full_response = (
+                        "I can execute resource termination via the ABACUS engine. "
+                        "However, you need to initiate the exact Resource ID in the 'Pro Automations' tab "
+                        "to ensure strict compliance and safety protocols."
+                    )
                 else:
-                    full_response = f"I have processed your query: '{user_query}'. According to our multi-cloud database, your overall architecture is highly optimized. I recommend reviewing the 'Pro Automations' tab to set up automated shields for further cost savings."
-            except Exception as e:
-                full_response = "I am currently unable to reach the database reasoning engine. Please check the backend connection."
+                    full_response = (
+                        f"I have processed your query: '{user_query}'. According to our multi-cloud database, "
+                        "your overall architecture is highly optimized. I recommend reviewing the 'Pro Automations' "
+                        "tab to set up automated shields for further cost savings."
+                    )
+            except Exception:
+                full_response = (
+                    "I am currently unable to reach the database reasoning engine. "
+                    "Please check the backend connection."
+                )
 
-            # Streaming effect (typing animation) like ChatGPT
+            # Streaming effect (like ChatGPT)
             streamed_text = ""
             for word in full_response.split():
                 streamed_text += word + " "
