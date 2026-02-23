@@ -8,13 +8,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Connect to REAL Supabase Database (FIXED SECRETS ERROR)
+# 2. Connect to REAL Supabase Database (100% FIXED)
 @st.cache_resource
 def init_supabase() -> Client:
     try:
-        # Correctly fetching the exact keys from secrets
-        url = st.secrets["api"] if "api" in st.secrets and "SUPABASE_URL" in st.secrets["api"] else st.secrets
-        key = st.secrets["api"] if "api" in st.secrets and "SUPABASE_KEY" in st.secrets["api"] else st.secrets
+        # Correctly fetching the exact text strings from the [api] block
+        url = st.secrets["api"]
+        key = st.secrets["api"]
         return create_client(url, key)
     except Exception as e:
         st.error(f"Critical Error: Supabase Secrets issue. Details: {e}")
@@ -28,29 +28,29 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-  .stApp { background-color: #f8fafc; }
-  .block-container { padding-top: 4rem; max-width: 30rem; }
-  .title-box { text-align: center; padding-bottom: 1.5rem; }
-  .title-box h1 { color: #0f172a; font-size: 2.2rem; font-weight: 800; margin-bottom: 0.2rem; }
-  .title-box p { color: #64748b; font-size: 1rem; }
-  .social-btn {
+ .stApp { background-color: #f8fafc; }
+ .block-container { padding-top: 4rem; max-width: 30rem; }
+ .title-box { text-align: center; padding-bottom: 1.5rem; }
+ .title-box h1 { color: #0f172a; font-size: 2.2rem; font-weight: 800; margin-bottom: 0.2rem; }
+ .title-box p { color: #64748b; font-size: 1rem; }
+ .social-btn {
         display: flex; align-items: center; justify-content: center;
         width: 100%; padding: 0.75rem; margin-bottom: 1rem;
         border-radius: 0.375rem; font-weight: 600; font-size: 0.95rem;
         text-decoration: none; color: #0f172a; background-color: white;
         border: 1px solid #cbd5e1; transition: all 0.2s;
     }
-  .social-btn:hover { background-color: #f1f5f9; border-color: #94a3b8; }
-  .github-btn { background-color: #24292e; color: white; border: none; }
-  .github-btn:hover { background-color: #1b1f23; }
-  .social-icon { width: 22px; height: 22px; margin-right: 12px; }
-  .divider {
+ .social-btn:hover { background-color: #f1f5f9; border-color: #94a3b8; }
+ .github-btn { background-color: #24292e; color: white; border: none; }
+ .github-btn:hover { background-color: #1b1f23; }
+ .social-icon { width: 22px; height: 22px; margin-right: 12px; }
+ .divider {
         display: flex; align-items: center; text-align: center;
         margin: 1.5rem 0; color: #94a3b8; font-size: 0.85rem; font-weight: 500;
     }
-  .divider::before,.divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
-  .divider:not(:empty)::before { margin-right:.5em; }
-  .divider:not(:empty)::after { margin-left:.5em; }
+ .divider::before,.divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
+ .divider:not(:empty)::before { margin-right:.5em; }
+ .divider:not(:empty)::after { margin-left:.5em; }
 </style>
 """, unsafe_allow_html=True)
 
