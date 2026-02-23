@@ -1,4 +1,5 @@
 import streamlit as st
+from supabase import create_client, Client
 
 # 1. Page Configuration
 st.set_page_config(
@@ -7,98 +8,58 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Enterprise SaaS Custom CSS
+# 2. Connect to REAL Supabase Database
+@st.cache_resource
+def init_supabase() -> Client:
+    try:
+        url = st.secrets["api"]
+        key = st.secrets["api"]
+        return create_client(url, key)
+    except Exception as e:
+        st.error("Critical Error: Supabase Secrets are missing in Streamlit Cloud.")
+        st.stop()
+
+supabase = init_supabase()
+
+# 3. Enterprise SaaS Custom CSS (No Emojis)
 st.markdown("""
 <style>
-    /* Hide default Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    
-    /* Clean UI Background */
-   .stApp {
-        background-color: #f8fafc;
-    }
-   .block-container {
-        padding-top: 4rem;
-        max-width: 30rem;
-    }
-   .title-box {
-        text-align: center;
-        padding-bottom: 1.5rem;
-    }
-   .title-box h1 {
-        color: #0f172a;
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin-bottom: 0.2rem;
-    }
-   .title-box p {
-        color: #64748b;
-        font-size: 1rem;
-    }
+   .stApp { background-color: #f8fafc; }
+   .block-container { padding-top: 4rem; max-width: 30rem; }
+   .title-box { text-align: center; padding-bottom: 1.5rem; }
+   .title-box h1 { color: #0f172a; font-size: 2.2rem; font-weight: 800; margin-bottom: 0.2rem; }
+   .title-box p { color: #64748b; font-size: 1rem; }
    .social-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        padding: 0.75rem;
-        margin-bottom: 1rem;
-        border-radius: 0.375rem;
-        font-weight: 600;
-        font-size: 0.95rem;
-        text-decoration: none;
-        color: #0f172a;
-        background-color: white;
-        border: 1px solid #cbd5e1;
-        transition: all 0.2s;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        display: flex; align-items: center; justify-content: center;
+        width: 100%; padding: 0.75rem; margin-bottom: 1rem;
+        border-radius: 0.375rem; font-weight: 600; font-size: 0.95rem;
+        text-decoration: none; color: #0f172a; background-color: white;
+        border: 1px solid #cbd5e1; transition: all 0.2s;
     }
-   .social-btn:hover {
-        background-color: #f1f5f9;
-        border-color: #94a3b8;
-    }
-   .github-btn {
-        background-color: #24292e;
-        color: white;
-        border: none;
-    }
-   .github-btn:hover {
-        background-color: #1b1f23;
-    }
-   .social-icon {
-        width: 22px;
-        height: 22px;
-        margin-right: 12px;
-    }
+   .social-btn:hover { background-color: #f1f5f9; border-color: #94a3b8; }
+   .github-btn { background-color: #24292e; color: white; border: none; }
+   .github-btn:hover { background-color: #1b1f23; }
+   .social-icon { width: 22px; height: 22px; margin-right: 12px; }
    .divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        margin: 1.5rem 0;
-        color: #94a3b8;
-        font-size: 0.85rem;
-        font-weight: 500;
+        display: flex; align-items: center; text-align: center;
+        margin: 1.5rem 0; color: #94a3b8; font-size: 0.85rem; font-weight: 500;
     }
-   .divider::before,.divider::after {
-        content: '';
-        flex: 1;
-        border-bottom: 1px solid #e2e8f0;
-    }
+   .divider::before,.divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
    .divider:not(:empty)::before { margin-right:.5em; }
    .divider:not(:empty)::after { margin-left:.5em; }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Session State Initialization
+# 4. Session State
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.tenant_id = ""
 
-# 4. Authentication UI
+# 5. REAL Authentication UI
 if not st.session_state.authenticated:
-    
-    # Header
     st.markdown("""
         <div class="title-box">
             <h1>TEJUSKA Cloud</h1>
@@ -106,39 +67,52 @@ if not st.session_state.authenticated:
         </div>
     """, unsafe_allow_html=True)
     
-    # Social Login Buttons with Highly Reliable CDN Logos
+    # In production, these URLs will be generated dynamically via OAuth
     st.markdown("""
         <a href="#" class="social-btn">
             <img class="social-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"/>
-            Continue with Google
+            Continue with Google (Setup Required)
         </a>
         <a href="#" class="social-btn github-btn">
             <img class="social-icon" style="filter: invert(1);" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"/>
-            Continue with GitHub
+            Continue with GitHub (Setup Required)
         </a>
-        <div class="divider">OR SIGN IN WITH EMAIL</div>
+        <div class="divider">OR SECURE EMAIL LOGIN</div>
     """, unsafe_allow_html=True)
     
-    # Secure Email Login Form (Fixed typing issue by removing st.form wrapper)
     with st.container():
         email_input = st.text_input("Work Email", placeholder="name@company.com")
-        password_input = st.text_input("Password", type="password", placeholder="........")
+        password_input = st.text_input("Password", type="password", placeholder="Min 6 characters")
         
-        # Native Streamlit Button for processing logic
-        if st.button("Sign In to Workspace", type="primary", use_container_width=True):
-            if email_input and "@" in email_input:
-                st.session_state.authenticated = True
-                st.session_state.tenant_id = email_input
-                st.rerun()
+        if st.button("Sign In / Create Account", type="primary", use_container_width=True):
+            if email_input and len(password_input) >= 6:
+                try:
+                    # Attempt to Login (REAL DB CONNECTION)
+                    response = supabase.auth.sign_in_with_password({"email": email_input, "password": password_input})
+                    st.session_state.authenticated = True
+                    st.session_state.tenant_id = response.user.email
+                    st.rerun()
+                except Exception as e:
+                    error_msg = str(e)
+                    if "Invalid login credentials" in error_msg:
+                        try:
+                            # Auto-register if user doesn't exist (REAL DB CONNECTION)
+                            res = supabase.auth.sign_up({"email": email_input, "password": password_input})
+                            st.success("New secure account created! Please click the button again to login.")
+                        except Exception as ex:
+                            st.error(f"Registration failed: {ex}")
+                    else:
+                        st.error("Authentication Error. Please check your credentials.")
             else:
-                st.error("Please enter a valid corporate email address.")
+                st.error("Please enter a valid email and a password of at least 6 characters.")
 
 else:
-    # 5. Post-Login Screen
-    st.success(f"Successfully authenticated as: {st.session_state.tenant_id}")
-    st.info("Your secure session is active. Please expand the sidebar menu to access the FinOps Dashboard and AI Assistant.")
+    # 6. Post-Login Screen
+    st.success(f"Secure session active for: {st.session_state.tenant_id}")
+    st.info("Navigation unlocked. Use the sidebar menu to access your FinOps Dashboards.")
     
-    if st.button("Sign Out", type="secondary"):
+    if st.button("Secure Sign Out", type="secondary"):
+        supabase.auth.sign_out()
         st.session_state.authenticated = False
         st.session_state.tenant_id = ""
         st.rerun()
