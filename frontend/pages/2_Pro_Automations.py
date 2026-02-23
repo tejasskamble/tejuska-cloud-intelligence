@@ -19,7 +19,8 @@ with col1:
     st.markdown("### 1. Set Budget Threshold")
     st.info("Configure the maximum allowed cost for a specific cloud resource.")
     with st.form("threshold_form"):
-        provider = st.selectbox("Cloud Provider",)
+        # EXACT FIX: Added to the selectbox
+        provider = st.selectbox("Cloud Provider",) 
         resource_id = st.text_input("Resource ID", placeholder="e.g., i-09ca51ce7bcd242ed")
         threshold = st.number_input("Cost Threshold Limit ($)", min_value=0.01, value=1.00, step=0.50)
         user_email = st.text_input("Alert Email ID", value=st.session_state.tenant_id)
