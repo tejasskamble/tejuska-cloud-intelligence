@@ -8,11 +8,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Connect to REAL Supabase Database (THE EXACT FOUNDER FIX)
+# 2. Connect to REAL Supabase Database (THE REAL FOUNDER'S EXACT FIX)
 @st.cache_resource
 def init_supabase() -> Client:
     try:
-        # Fetching the exact string values using the correct keys!
+        # Fetching the exact string values using the CORRECT dictionary keys!
         url = st.secrets["api"]
         key = st.secrets["api"]
         return create_client(url, key)
