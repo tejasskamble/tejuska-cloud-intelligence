@@ -14,10 +14,10 @@ if not st.session_state.get("authenticated"):
 # ------------------------
 # 2. Header
 # ------------------------
-st.markdown("## ⚡ OPTIC FinOps AI Assistant – Infinity Ultra Pro Max (Simulated GPT)")
+st.markdown("## ⚡ OPTIC FinOps AI Assistant – Gemini Ultra Mode")
 st.markdown(
-    "Ask anything about your cloud infrastructure costs. "
-    "This simulation responds like a ChatGPT FinOps assistant."
+    "Chat freely with your multi-cloud FinOps assistant. "
+    "Ask anything, and it will respond like a full AI expert, maintaining context and giving advice."
 )
 st.divider()
 
@@ -47,7 +47,6 @@ with col1:
         user_email = st.text_input("Alert Email", value=st.session_state.get("tenant_id", ""))
 
         submit_threshold = st.form_submit_button("Activate Agentic Shield", type="primary")
-
         if submit_threshold:
             if resource_id:
                 st.session_state.thresholds[resource_id] = {
@@ -63,10 +62,10 @@ with col1:
                 st.error("Enter a valid Resource ID!")
 
 # ------------------------
-# Column 2: Simulated Chat Assistant
+# Column 2: Gemini-Style Chat Assistant
 # ------------------------
 with col2:
-    st.markdown("### 🤖 FinOps Chat Assistant (Simulation Mode)")
+    st.markdown("### 🤖 Gemini-Style AI Chat (Simulation Mode)")
 
     # Display previous messages
     for message in st.session_state.chat_messages:
@@ -74,32 +73,31 @@ with col2:
             st.markdown(message["content"])
 
     # Chat input
-    if user_query := st.chat_input("Ask anything about your cloud infrastructure costs..."):
+    if user_query := st.chat_input("Talk freely with your FinOps AI..."):
         # Append user message
         st.session_state.chat_messages.append({"role": "user", "content": user_query})
         with st.chat_message("user"):
             st.markdown(user_query)
 
-        # Simulated GPT-style response
+        # Simulated Gemini AI response
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
-
-            with st.spinner("Analyzing your cloud metrics..."):
-                # Simulate processing
+            with st.spinner("Thinking like Gemini AI..."):
                 time.sleep(1)
 
-                # Generate dynamic GPT-style reply
-                possible_responses = [
-                    f"Simulated answer: '{user_query}'. Multi-cloud architecture looks optimized. Consider setting automated shields for further cost control.",
-                    f"Analyzing '{user_query}'... All AWS/Azure/GCP resources are within thresholds. Suggest reviewing ABACUS policies.",
-                    f"Got your query '{user_query}'. The cost projections are stable. You may want to enable automated alerts for {random.choice(['AWS', 'Azure', 'GCP'])} resources.",
-                    f"Processed '{user_query}'. Multi-cloud efficiency is high. Recommend generating SQL insights for deeper analysis."
+                # Generate dynamic context-aware reply
+                context = " ".join([m["content"] for m in st.session_state.chat_messages[-5:]])  # last 5 msgs
+                dynamic_responses = [
+                    f"Hey! Regarding '{user_query}', your multi-cloud setup seems optimized. Have you checked automated shields?",
+                    f"I see your question: '{user_query}'. AWS, Azure, and GCP resources are under monitoring. I recommend reviewing ABACUS policies.",
+                    f"Analyzing '{user_query}'... your current thresholds look good, but consider adding alerts for critical resources.",
+                    f"Regarding '{user_query}', multi-cloud efficiency is high. Generating SQL insights could help further optimization.",
+                    f"Interesting query '{user_query}'. Your infrastructure is stable. Setting proactive cost alerts is suggested."
                 ]
+                full_response = random.choice(dynamic_responses)
 
-                full_response = random.choice(possible_responses)
-
-                # Streaming effect like ChatGPT
+                # Streaming effect like ChatGPT/Gemini
                 streamed_text = ""
                 for word in full_response.split():
                     streamed_text += word + " "
@@ -107,11 +105,11 @@ with col2:
                     time.sleep(0.02)
                 message_placeholder.markdown(full_response)
 
-            # Append simulated assistant message
+            # Append assistant message
             st.session_state.chat_messages.append({"role": "assistant", "content": full_response})
 
 # ------------------------
-# Optional: Show Active Thresholds
+# Optional: View Active Thresholds
 # ------------------------
 with st.expander("View Active Thresholds"):
     if st.session_state.thresholds:
