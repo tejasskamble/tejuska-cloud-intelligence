@@ -157,7 +157,7 @@ def render_profile_menu(theme: str):
     if not st.session_state.get("authenticated", False):
         return
 
-    text_color = "text-slate-900" if theme == "light" else "text-slate-50"
+    text_color = "text-slate-900 dark:text-slate-50"
 
     # Fixed container for the popover trigger
     st.markdown(
@@ -198,14 +198,14 @@ def metric_card(label: str, value: str, delta: str = None, theme: str = "light")
     """
     Returns an HTML string for a metric card styled with Tailwind.
     """
-    bg = "bg-white" if theme == "light" else "bg-slate-800"
-    text = "text-slate-900" if theme == "light" else "text-slate-50"
-    border = "border-slate-200" if theme == "light" else "border-slate-700"
-    shadow = "shadow-md" if theme == "light" else "shadow-lg"
+    bg = "bg-white dark:bg-slate-800"
+    text = "text-slate-900 dark:text-slate-50"
+    border = "border-slate-200 dark:border-slate-700"
+    shadow = "shadow-md dark:shadow-lg"
 
     delta_html = ""
     if delta:
-        delta_color = "text-emerald-600" if theme == "light" else "text-emerald-400"
+        delta_color = "text-emerald-600 dark:text-emerald-400"
         delta_html = f'<p class="text-sm {delta_color}">{delta}</p>'
 
     return f"""
@@ -220,10 +220,10 @@ def pricing_card(title: str, price: str, features: list, theme: str = "light") -
     """
     Returns an HTML string for a pricing card.
     """
-    bg = "bg-white" if theme == "light" else "bg-slate-800"
-    text = "text-slate-900" if theme == "light" else "text-slate-50"
-    border = "border-slate-200" if theme == "light" else "border-slate-700"
-    primary = "text-indigo-600" if theme == "light" else "text-indigo-400"
+    bg = "bg-white dark:bg-slate-800"
+    text = "text-slate-900 dark:text-slate-50"
+    border = "border-slate-200 dark:border-slate-700"
+    primary = "text-indigo-600 dark:text-indigo-400"
 
     features_list = "".join([f'<li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> {f}</li>' for f in features])
 
@@ -241,7 +241,7 @@ def status_indicator(provider: str, is_connected: bool, theme: str = "light") ->
     """
     Returns HTML for a status indicator with colored circle.
     """
-    text = "text-slate-900" if theme == "light" else "text-slate-50"
+    text = "text-slate-900 dark:text-slate-50"
     circle = "bg-emerald-500" if is_connected else "bg-red-500"
     status = "Active" if is_connected else "Disconnected"
     return f"""
