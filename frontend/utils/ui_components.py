@@ -13,6 +13,142 @@ def inject_tailwind():
         unsafe_allow_html=True,
     )
 
+def get_theme_css(theme: str) -> str:
+    """
+    Returns a CSS string that overrides Streamlit's default colors based on the theme.
+    This ensures all native Streamlit components (metrics, dataframes, etc.) inherit the theme.
+    """
+    if theme == "dark":
+        return """
+        <style>
+            .stApp {
+                background-color: #0F172A !important;  /* slate-900 */
+                color: #F8FAFC !important;            /* slate-50 */
+            }
+            /* Metric cards */
+            div[data-testid="metric-container"] {
+                background-color: #1E293B !important;  /* slate-800 */
+                color: #F8FAFC !important;
+                border: 1px solid #334155 !important;  /* slate-700 */
+            }
+            label[data-testid="stMetricLabel"] {
+                color: #F8FAFC !important;
+                opacity: 0.8;
+            }
+            /* DataFrames */
+            .stDataFrame {
+                background-color: #1E293B !important;
+                color: #F8FAFC !important;
+            }
+            .stDataFrame table {
+                color: #F8FAFC !important;
+            }
+            .stDataFrame th {
+                background: #818CF8 !important;
+                color: white !important;
+            }
+            .stDataFrame td {
+                background-color: #1E293B !important;
+                color: #F8FAFC !important;
+                border-bottom: 1px solid #334155 !important;
+            }
+            /* Input fields */
+            .stTextInput input, .stTextInput textarea {
+                background-color: #1E293B !important;
+                color: #F8FAFC !important;
+                border: 1px solid #334155 !important;
+            }
+            .stTextInput input:focus {
+                border-color: #818CF8 !important;
+            }
+            /* Buttons */
+            .stButton button {
+                background: linear-gradient(135deg, #818CF8, #A78BFA) !important;
+                color: white !important;
+                border: none !important;
+            }
+            .stButton button[kind="secondary"] {
+                background: transparent !important;
+                border: 1px solid #818CF8 !important;
+                color: #818CF8 !important;
+            }
+            .stButton button[kind="secondary"]:hover {
+                background: #818CF8 !important;
+                color: white !important;
+            }
+            /* Expander */
+            .streamlit-expanderHeader {
+                color: #F8FAFC !important;
+                background-color: #1E293B !important;
+            }
+        </style>
+        """
+    else:
+        return """
+        <style>
+            .stApp {
+                background-color: #F8FAFC !important;  /* slate-50 */
+                color: #0F172A !important;             /* slate-900 */
+            }
+            /* Metric cards */
+            div[data-testid="metric-container"] {
+                background-color: #FFFFFF !important;
+                color: #0F172A !important;
+                border: 1px solid #E2E8F0 !important;  /* slate-200 */
+            }
+            label[data-testid="stMetricLabel"] {
+                color: #0F172A !important;
+                opacity: 0.8;
+            }
+            /* DataFrames */
+            .stDataFrame {
+                background-color: #FFFFFF !important;
+                color: #0F172A !important;
+            }
+            .stDataFrame table {
+                color: #0F172A !important;
+            }
+            .stDataFrame th {
+                background: #6366F1 !important;
+                color: white !important;
+            }
+            .stDataFrame td {
+                background-color: #FFFFFF !important;
+                color: #0F172A !important;
+                border-bottom: 1px solid #E2E8F0 !important;
+            }
+            /* Input fields */
+            .stTextInput input, .stTextInput textarea {
+                background-color: #FFFFFF !important;
+                color: #0F172A !important;
+                border: 1px solid #E2E8F0 !important;
+            }
+            .stTextInput input:focus {
+                border-color: #6366F1 !important;
+            }
+            /* Buttons */
+            .stButton button {
+                background: linear-gradient(135deg, #6366F1, #818CF8) !important;
+                color: white !important;
+                border: none !important;
+            }
+            .stButton button[kind="secondary"] {
+                background: transparent !important;
+                border: 1px solid #6366F1 !important;
+                color: #6366F1 !important;
+            }
+            .stButton button[kind="secondary"]:hover {
+                background: #6366F1 !important;
+                color: white !important;
+            }
+            /* Expander */
+            .streamlit-expanderHeader {
+                color: #0F172A !important;
+                background-color: #FFFFFF !important;
+            }
+        </style>
+        """
+
 def render_profile_menu(theme: str):
     """
     Renders a GitHub‑style profile popover in the top‑right corner.
@@ -21,7 +157,6 @@ def render_profile_menu(theme: str):
     if not st.session_state.get("authenticated", False):
         return
 
-    # Choose text color based on theme
     text_color = "text-slate-900" if theme == "light" else "text-slate-50"
 
     # Fixed container for the popover trigger
