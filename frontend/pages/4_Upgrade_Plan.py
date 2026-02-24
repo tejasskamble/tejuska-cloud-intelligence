@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.ui_components import inject_tailwind, render_profile_menu, pricing_card
+from utils.ui_components import inject_tailwind, get_theme_css, render_profile_menu, pricing_card
 
 st.set_page_config(
     page_title="Upgrade Plan | TEJUSKA",
@@ -16,10 +16,10 @@ with st.sidebar:
     dark_mode = st.toggle("Dark mode", value=(st.session_state.theme == "dark"))
     st.session_state.theme = "dark" if dark_mode else "light"
 
-bg_class = "bg-slate-50" if st.session_state.theme == "light" else "bg-slate-900"
-text_class = "text-slate-900" if st.session_state.theme == "light" else "text-slate-50"
+st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-st.markdown(f'<div class="{bg_class} min-h-screen {text_class} p-6">', unsafe_allow_html=True)
+wrapper_class = "bg-slate-50 text-slate-900" if st.session_state.theme == "light" else "bg-slate-900 text-slate-50"
+st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
 
 render_profile_menu(st.session_state.theme)
 
@@ -46,7 +46,7 @@ with col3:
     if st.button("Contact Sales", key="enterprise_btn", use_container_width=True):
         st.info("Email: sales@tejuska.io")
 
-st.markdown('<hr class="my-6 border-slate-300">', unsafe_allow_html=True)
+st.markdown('<hr class="my-6 border-slate-300 dark:border-slate-700">', unsafe_allow_html=True)
 st.markdown('<p class="text-sm opacity-70">**Payment processing** is handled securely by Stripe (global) and Razorpay (India). TEJUSKA does not store card details.</p>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
