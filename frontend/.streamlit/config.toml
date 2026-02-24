@@ -1,0 +1,12 @@
+[theme]
+primaryColor = "#6366F1"          # Indigo
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F1F5F9"
+textColor = "#0F172A"
+font = "sans serif"
+
+[theme.dark]
+primaryColor = "#818CF8"          # Lighter indigo
+backgroundColor = "#0B1120"       # Dark charcoal
+secondaryBackgroundColor = "#1E293B"
+textColor = "#F1F5F9"
