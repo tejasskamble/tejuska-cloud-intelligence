@@ -15,7 +15,7 @@ with st.sidebar:
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-wrapper_class = "bg-slate-50 text-slate-900" if st.session_state.theme == "light" else "bg-slate-900 text-slate-50"
+wrapper_class = "bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50"
 st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
 
 render_profile_menu(st.session_state.theme)
@@ -24,20 +24,20 @@ if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page.")
     st.stop()
 
-st.markdown('<h1 class="text-3xl font-bold">Agentic Auto-Kill & Thresholds</h1>', unsafe_allow_html=True)
-st.markdown('<p class="opacity-70">Set custom budget limits. The Agentic AI will automatically terminate resources and send email alerts if costs exceed your threshold.</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">Agentic Auto-Kill & Thresholds</h1>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300">Set custom budget limits. The Agentic AI will automatically terminate resources and send email alerts if costs exceed your threshold.</p>', unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown('<h2 class="text-xl font-semibold">1. Set Budget Threshold</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">1. Set Budget Threshold</h2>', unsafe_allow_html=True)
     st.info("Configure the maximum allowed cost for a specific cloud resource.")
     with st.form("threshold_form"):
         # Provider icon with Tailwind
         st.markdown(
             f"""
-            <div class="flex items-center gap-2 mb-2">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="{'text-slate-900' if st.session_state.theme == 'light' else 'text-slate-50'}">
+            <div class="flex items-center gap-2 mb-2 text-slate-900 dark:text-slate-50">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M12 2v20M2 12h20"/>
                 </svg>
@@ -60,8 +60,16 @@ with col1:
                 st.success(f"Shield Activated! If {provider} resource '{resource_id}' exceeds ${threshold:.2f}, it will be TERMINATED immediately and an alert will be sent to {user_email}.")
 
 with col2:
-    st.markdown('<h2 class="text-xl font-semibold">2. Simulate Cloud Billing (Test)</h2>', unsafe_allow_html=True)
-    st.warning("Test the automation by simulating a bill that exceeds your threshold.")
+    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">2. Simulate Cloud Billing (Test)</h2>', unsafe_allow_html=True)
+    # Fixed warning box with proper light/dark colors
+    st.markdown(
+        """
+        <div class="p-4 mb-4 text-sm text-yellow-900 bg-yellow-100 rounded-lg dark:bg-yellow-900 dark:text-yellow-100" role="alert">
+            <span class="font-medium">Test the automation</span> by simulating a bill that exceeds your threshold.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     with st.form("simulate_form"):
         sim_resource_id = st.text_input("Resource ID to Test", value="i-09ca51ce7bcd242ed")
         sim_cost = st.number_input("Current Simulated Cost ($)", value=1.50)
