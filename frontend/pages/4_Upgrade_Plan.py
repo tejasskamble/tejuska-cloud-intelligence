@@ -18,17 +18,14 @@ with st.sidebar:
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-wrapper_class = "bg-slate-50 text-slate-900" if st.session_state.theme == "light" else "bg-slate-900 text-slate-50"
-st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
-
 render_profile_menu(st.session_state.theme)
 
 if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page to access this section.")
     st.stop()
 
-st.markdown('<h1 class="text-3xl font-bold">Upgrade Your Plan</h1>', unsafe_allow_html=True)
-st.markdown('<p class="opacity-70">Unlock the full power of TEJUSKA Cloud Intelligence. All plans include a 14-day free trial. No credit card required for the Free tier.</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">Upgrade Your Plan</h1>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300">Unlock the full power of TEJUSKA Cloud Intelligence. All plans include a 14-day free trial. No credit card required for the Free tier.</p>', unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3)
 
@@ -47,6 +44,4 @@ with col3:
         st.info("Email: sales@tejuska.io")
 
 st.markdown('<hr class="my-6 border-slate-300 dark:border-slate-700">', unsafe_allow_html=True)
-st.markdown('<p class="text-sm opacity-70">**Payment processing** is handled securely by Stripe (global) and Razorpay (India). TEJUSKA does not store card details.</p>', unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('<p class="text-sm opacity-70 text-slate-700 dark:text-slate-300">**Payment processing** is handled securely by Stripe (global) and Razorpay (India). TEJUSKA does not store card details.</p>', unsafe_allow_html=True)
