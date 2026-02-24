@@ -17,17 +17,14 @@ with st.sidebar:
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-wrapper_class = "bg-slate-50 text-slate-900" if st.session_state.theme == "light" else "bg-slate-900 text-slate-50"
-st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
-
 render_profile_menu(st.session_state.theme)
 
 if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page.")
     st.stop()
 
-st.markdown('<h1 class="text-3xl font-bold">OPTIC FinOps AI Assistant – Gemini Ultra Mode</h1>', unsafe_allow_html=True)
-st.markdown('<p class="opacity-70">Chat freely with your multi-cloud FinOps assistant. Ask anything, and it will respond like a full AI expert, maintaining context and giving advice.</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">OPTIC FinOps AI Assistant – Gemini Ultra Mode</h1>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300">Chat freely with your multi-cloud FinOps assistant. Ask anything, and it will respond like a full AI expert, maintaining context and giving advice.</p>', unsafe_allow_html=True)
 
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
@@ -38,12 +35,12 @@ if "thresholds" not in st.session_state:
 col1, col2 = st.columns([1, 2])
 
 with col1:
-    st.markdown('<h2 class="text-xl font-semibold">Agentic Budget Thresholds</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">Agentic Budget Thresholds</h2>', unsafe_allow_html=True)
     with st.form("threshold_form"):
         st.markdown(
             f"""
-            <div class="flex items-center gap-2 mb-2">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="{'text-slate-900' if st.session_state.theme == 'light' else 'text-slate-50'}">
+            <div class="flex items-center gap-2 mb-2 text-slate-900 dark:text-slate-50">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M12 2v20M2 12h20"/>
                 </svg>
@@ -66,7 +63,7 @@ with col1:
                 st.error("Enter a valid Resource ID!")
 
 with col2:
-    st.markdown('<h2 class="text-xl font-semibold">Gemini-Style AI Chat (Simulation Mode)</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">Gemini-Style AI Chat (Simulation Mode)</h2>', unsafe_allow_html=True)
 
     for message in st.session_state.chat_messages:
         with st.chat_message(message["role"]):
@@ -107,5 +104,3 @@ with st.expander("View Active Thresholds"):
             st.write(f"{rid}: {info}")
     else:
         st.write("No thresholds set yet.")
-
-st.markdown('</div>', unsafe_allow_html=True)
