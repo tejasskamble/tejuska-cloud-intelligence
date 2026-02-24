@@ -6,193 +6,234 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CUSTOM CSS ====================
-st.markdown("""
+# ---------- Theme state ----------
+if "theme" not in st.session_state:
+    st.session_state.theme = "light"  # default
+
+# Theme toggle in sidebar (sidebar is collapsed but can be expanded)
+with st.sidebar:
+    st.markdown("## Appearance")
+    dark_mode = st.toggle("Dark mode", value=(st.session_state.theme == "dark"))
+    st.session_state.theme = "dark" if dark_mode else "light"
+
+# ---------- Dynamic CSS based on theme ----------
+if st.session_state.theme == "dark":
+    bg_color = "#0B1120"
+    text_color = "#F1F5F9"
+    secondary_bg = "#1E293B"
+    primary_color = "#818CF8"
+    accent_success = "#10B981"
+    accent_error = "#EF4444"
+    border_color = "#334155"
+    card_shadow = "0 4px 6px -1px rgba(0, 0, 0, 0.3)"
+else:
+    bg_color = "#FFFFFF"
+    text_color = "#0F172A"
+    secondary_bg = "#F1F5F9"
+    primary_color = "#6366F1"
+    accent_success = "#059669"
+    accent_error = "#DC2626"
+    border_color = "#E2E8F0"
+    card_shadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05)"
+
+st.markdown(f"""
 <style>
     /* Hide Streamlit branding */
-    #MainMenu, footer, header {visibility: hidden;}
-    
+    #MainMenu, footer, header {{visibility: hidden;}}
+
     /* Use theme variables */
-    .stApp {
-        background-color: var(--background-color);
-        color: var(--text-color);
-    }
-    
+    .stApp {{
+        background-color: {bg_color};
+        color: {text_color};
+    }}
+
     /* Typography */
-    h1, h2, h3 {
+    h1, h2, h3 {{
         font-weight: 700;
         letter-spacing: -0.02em;
-    }
-    h1 {
-        background: linear-gradient(135deg, var(--primary-color) 0%, #A78BFA 100%);
+    }}
+    h1 {{
+        background: linear-gradient(135deg, {primary_color} 0%, #A78BFA 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-    }
-    
+    }}
+
     /* Buttons */
-    .stButton button {
+    .stButton button {{
         border-radius: 8px;
         font-weight: 600;
         transition: all 0.2s ease;
         border: none;
-        background: linear-gradient(135deg, var(--primary-color), #818CF8);
+        background: linear-gradient(135deg, {primary_color}, #818CF8);
         color: white;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    .stButton button:hover {
+        box-shadow: {card_shadow};
+    }}
+    .stButton button:hover {{
         transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
-    }
-    .stButton button[kind="secondary"] {
+        box-shadow: 0 10px 15px -3px {primary_color}80;
+    }}
+    .stButton button[kind="secondary"] {{
         background: transparent;
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
+        border: 1px solid {primary_color};
+        color: {primary_color};
         box-shadow: none;
-    }
-    .stButton button[kind="secondary"]:hover {
-        background: var(--primary-color);
+    }}
+    .stButton button[kind="secondary"]:hover {{
+        background: {primary_color};
         color: white;
-    }
-    
+    }}
+
     /* Metric cards */
-    div[data-testid="metric-container"] {
-        background: var(--secondary-background-color);
+    div[data-testid="metric-container"] {{
+        background: {secondary_bg};
         border-radius: 16px;
         padding: 1.5rem 1rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: {card_shadow};
+        border: 1px solid {border_color};
         transition: all 0.2s;
-    }
-    div[data-testid="metric-container"]:hover {
-        box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1);
-        border-color: var(--primary-color);
-    }
-    label[data-testid="stMetricLabel"] {
+    }}
+    div[data-testid="metric-container"]:hover {{
+        box-shadow: 0 20px 25px -5px {primary_color}40;
+        border-color: {primary_color};
+    }}
+    label[data-testid="stMetricLabel"] {{
         font-size: 0.9rem;
         font-weight: 500;
-        color: var(--text-color);
+        color: {text_color};
         opacity: 0.8;
-    }
-    
+    }}
+
     /* DataFrames */
-    .stDataFrame {
+    .stDataFrame {{
         border-radius: 12px;
         overflow: hidden;
-        border: 1px solid var(--secondary-background-color);
-    }
-    .stDataFrame table {
+        border: 1px solid {border_color};
+    }}
+    .stDataFrame table {{
         font-size: 0.9rem;
-    }
-    .stDataFrame th {
-        background: linear-gradient(135deg, var(--primary-color), #A78BFA);
+        color: {text_color};
+    }}
+    .stDataFrame th {{
+        background: linear-gradient(135deg, {primary_color}, #A78BFA);
         color: white;
         font-weight: 600;
         padding: 0.75rem !important;
-    }
-    .stDataFrame td {
+    }}
+    .stDataFrame td {{
         padding: 0.6rem !important;
-        border-bottom: 1px solid var(--secondary-background-color);
-    }
-    .stDataFrame tr:hover td {
-        background-color: var(--secondary-background-color);
-    }
-    
+        border-bottom: 1px solid {border_color};
+        background: {secondary_bg};
+    }}
+    .stDataFrame tr:hover td {{
+        background-color: {primary_color}20;
+    }}
+
     /* Status indicators */
-    .status-active, .status-inactive {
+    .status-active, .status-inactive {{
         display: inline-block;
         width: 12px;
         height: 12px;
         border-radius: 50%;
         margin-right: 8px;
-    }
-    .status-active {
-        background: #10B981;
-        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-    }
-    .status-inactive {
-        background: #EF4444;
-        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
-    }
-    
+    }}
+    .status-active {{
+        background: {accent_success};
+        box-shadow: 0 0 0 2px {accent_success}40;
+    }}
+    .status-inactive {{
+        background: {accent_error};
+        box-shadow: 0 0 0 2px {accent_error}40;
+    }}
+
     /* Pricing cards */
-    .pricing-card {
-        background: var(--secondary-background-color);
+    .pricing-card {{
+        background: {secondary_bg};
         border-radius: 24px;
         padding: 2rem 1.5rem;
-        border: 1px solid rgba(0,0,0,0.05);
+        border: 1px solid {border_color};
         transition: transform 0.2s, border-color 0.2s;
-    }
-    .pricing-card:hover {
+    }}
+    .pricing-card:hover {{
         transform: scale(1.02);
-        border-color: var(--primary-color);
-    }
-    .pricing-card h4 {
+        border-color: {primary_color};
+    }}
+    .pricing-card h4 {{
         font-size: 1.5rem;
         font-weight: 700;
         margin-bottom: 1rem;
-        color: var(--primary-color);
-    }
-    .pricing-card ul {
+        color: {primary_color};
+    }}
+    .pricing-card ul {{
         list-style-type: none;
         padding-left: 0;
-    }
-    .pricing-card li {
+        color: {text_color};
+    }}
+    .pricing-card li {{
         margin-bottom: 0.5rem;
-    }
-    
-    /* Icons inline */
-    .provider-icon {
+    }}
+
+    /* Icons */
+    .provider-icon {{
         width: 24px;
         height: 24px;
         vertical-align: middle;
         margin-right: 8px;
         display: inline-block;
-    }
-    .social-icon {
+    }}
+    .social-icon {{
         width: 22px;
         height: 22px;
         margin-right: 12px;
         vertical-align: middle;
-    }
-    
+    }}
+    /* GitHub icon fill adapts to theme */
+    .github-icon {{
+        fill: {text_color};
+    }}
+
     /* Divider */
-    .divider {
+    .divider {{
         display: flex;
         align-items: center;
         text-align: center;
         margin: 1.5rem 0;
-        color: var(--text-color);
+        color: {text_color};
         opacity: 0.5;
-    }
-    .divider::before, .divider::after {
+    }}
+    .divider::before, .divider::after {{
         content: '';
         flex: 1;
-        border-bottom: 1px solid var(--secondary-background-color);
-    }
-    .divider:not(:empty)::before { margin-right: .5em; }
-    .divider:not(:empty)::after { margin-left: .5em; }
-    
+        border-bottom: 1px solid {border_color};
+    }}
+    .divider:not(:empty)::before {{ margin-right: .5em; }}
+    .divider:not(:empty)::after {{ margin-left: .5em; }}
+
     /* Input fields */
-    .stTextInput input, .stTextInput textarea {
+    .stTextInput input, .stTextInput textarea {{
         border-radius: 8px;
-        border: 1px solid var(--secondary-background-color);
-        background: var(--background-color);
-        color: var(--text-color);
-    }
-    .stTextInput input:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-    }
+        border: 1px solid {border_color};
+        background: {secondary_bg};
+        color: {text_color};
+    }}
+    .stTextInput input:focus {{
+        border-color: {primary_color};
+        box-shadow: 0 0 0 2px {primary_color}40;
+    }}
+
+    /* Sidebar */
+    .css-1d391kg, .css-1wrcr25 {{
+        background-color: {secondary_bg};
+    }}
 </style>
 """, unsafe_allow_html=True)
 
-# ==================== SESSION STATE ====================
+# ---------- Session state ----------
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.tenant_id = ""
 
-# ==================== LOGIN UI ====================
+# ---------- Login UI ----------
 if not st.session_state.authenticated:
     st.markdown("""
         <div style="text-align: center; padding-bottom: 2rem;">
@@ -202,7 +243,7 @@ if not st.session_state.authenticated:
     """, unsafe_allow_html=True)
 
     # Social login buttons with inline SVGs
-    st.markdown("""
+    st.markdown(f"""
         <div style="display: flex; flex-direction: column; gap: 1rem;">
             <a href="#" style="display: flex; align-items: center; justify-content: center; padding: 0.75rem; border-radius: 8px; background: white; border: 1px solid #cbd5e1; color: #0f172a; text-decoration: none; font-weight: 600; transition: all 0.2s;">
                 <svg class="social-icon" viewBox="0 0 24 24" width="22" height="22">
@@ -214,7 +255,7 @@ if not st.session_state.authenticated:
                 Continue with Google
             </a>
             <a href="#" style="display: flex; align-items: center; justify-content: center; padding: 0.75rem; border-radius: 8px; background: #24292e; color: white; text-decoration: none; font-weight: 600; transition: all 0.2s;">
-                <svg class="social-icon" viewBox="0 0 24 24" width="22" height="22" fill="white">
+                <svg class="social-icon github-icon" viewBox="0 0 24 24" width="22" height="22" fill="white">
                     <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.098-2.646 0 0 .84-.269 2.75 1.025.8-.223 1.65-.334 2.5-.334.85 0 1.7.111 2.5.334 1.91-1.294 2.75-1.025 2.75-1.025.545 1.376.201 2.393.099 2.646.64.698 1.03 1.591 1.03 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
                 </svg>
                 Continue with GitHub
