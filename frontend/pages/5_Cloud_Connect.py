@@ -15,9 +15,6 @@ with st.sidebar:
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-wrapper_class = "bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50"
-st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
-
 render_profile_menu(st.session_state.theme)
 
 if not st.session_state.get("authenticated"):
@@ -106,5 +103,3 @@ with col3:
         if submit_gcp and gcp_project:
             st.session_state["gcp_connected"] = True
             st.rerun()
-
-st.markdown('</div>', unsafe_allow_html=True)
