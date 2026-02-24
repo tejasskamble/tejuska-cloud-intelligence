@@ -15,7 +15,7 @@ with st.sidebar:
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-wrapper_class = "bg-slate-50 text-slate-900" if st.session_state.theme == "light" else "bg-slate-900 text-slate-50"
+wrapper_class = "bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50"
 st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
 
 render_profile_menu(st.session_state.theme)
@@ -24,10 +24,10 @@ if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page.")
     st.stop()
 
-st.markdown('<h1 class="text-3xl font-bold">Multi-Cloud Integration Hub</h1>', unsafe_allow_html=True)
-st.markdown('<p class="opacity-70">Securely connect your AWS, Azure, and GCP environments to enable autonomous FinOps governance.</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">Multi-Cloud Integration Hub</h1>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300">Securely connect your AWS, Azure, and GCP environments to enable autonomous FinOps governance.</p>', unsafe_allow_html=True)
 
-st.markdown('<h2 class="text-xl font-semibold mt-4">Active Connections Status</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="text-xl font-semibold mt-4 text-slate-900 dark:text-slate-50">Active Connections Status</h2>', unsafe_allow_html=True)
 col_a, col_b, col_c = st.columns(3)
 with col_a:
     st.markdown(status_indicator("AWS", st.session_state.get("aws_connected", False), st.session_state.theme), unsafe_allow_html=True)
@@ -48,7 +48,7 @@ with col1:
                 <path d="M5.5 8.5L12 3L18.5 8.5M5.5 15.5L12 21L18.5 15.5"/>
                 <circle cx="12" cy="12" r="9"/>
             </svg>
-            <h3 class="text-lg font-semibold">AWS Connection</h3>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-50">AWS Connection</h3>
         </div>
         """,
         unsafe_allow_html=True,
@@ -70,7 +70,7 @@ with col2:
                 <rect x="4" y="4" width="16" height="16" rx="2"/>
                 <path d="M8 8h8v8H8z"/>
             </svg>
-            <h3 class="text-lg font-semibold">Azure Connection</h3>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-50">Azure Connection</h3>
         </div>
         """,
         unsafe_allow_html=True,
@@ -94,7 +94,7 @@ with col3:
                 <circle cx="17" cy="12" r="3" fill="#4285F4"/>
                 <circle cx="12" cy="7" r="3" fill="#FBBC05"/>
             </svg>
-            <h3 class="text-lg font-semibold">GCP Connection</h3>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-50">GCP Connection</h3>
         </div>
         """,
         unsafe_allow_html=True,
