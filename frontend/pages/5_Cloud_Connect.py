@@ -13,7 +13,6 @@ with st.sidebar:
     dark_mode = st.toggle("Dark mode", value=(st.session_state.theme == "dark"))
     st.session_state.theme = "dark" if dark_mode else "light"
 
-# Inject dynamic CSS for native components
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
 wrapper_class = "bg-slate-50 text-slate-900" if st.session_state.theme == "light" else "bg-slate-900 text-slate-50"
