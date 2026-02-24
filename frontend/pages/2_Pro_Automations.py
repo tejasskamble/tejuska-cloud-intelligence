@@ -15,9 +15,6 @@ with st.sidebar:
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-wrapper_class = "bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50"
-st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
-
 render_profile_menu(st.session_state.theme)
 
 if not st.session_state.get("authenticated"):
@@ -33,7 +30,7 @@ with col1:
     st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">1. Set Budget Threshold</h2>', unsafe_allow_html=True)
     st.info("Configure the maximum allowed cost for a specific cloud resource.")
     with st.form("threshold_form"):
-        # Provider icon with Tailwind
+        # Provider icon with Tailwind (custom HTML)
         st.markdown(
             f"""
             <div class="flex items-center gap-2 mb-2 text-slate-900 dark:text-slate-50">
@@ -84,5 +81,3 @@ with col2:
                 st.success("Email notification dispatched via SMTP.")
             else:
                 st.success("Cost is within limits. No action taken.")
-
-st.markdown('</div>', unsafe_allow_html=True)
