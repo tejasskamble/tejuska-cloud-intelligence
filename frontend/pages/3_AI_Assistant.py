@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 import random
-from utils.ui_components import inject_tailwind, render_profile_menu
+from utils.ui_components import inject_tailwind, get_theme_css, render_profile_menu
 
 st.set_page_config(page_title="AI Assistant | TEJUSKA", layout="wide")
 
@@ -15,10 +15,10 @@ with st.sidebar:
     dark_mode = st.toggle("Dark mode", value=(st.session_state.theme == "dark"))
     st.session_state.theme = "dark" if dark_mode else "light"
 
-bg_class = "bg-slate-50" if st.session_state.theme == "light" else "bg-slate-900"
-text_class = "text-slate-900" if st.session_state.theme == "light" else "text-slate-50"
+st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-st.markdown(f'<div class="{bg_class} min-h-screen {text_class} p-6">', unsafe_allow_html=True)
+wrapper_class = "bg-slate-50 text-slate-900" if st.session_state.theme == "light" else "bg-slate-900 text-slate-50"
+st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
 
 render_profile_menu(st.session_state.theme)
 
@@ -43,7 +43,7 @@ with col1:
         st.markdown(
             f"""
             <div class="flex items-center gap-2 mb-2">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="{text_class}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="{'text-slate-900' if st.session_state.theme == 'light' else 'text-slate-50'}">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M12 2v20M2 12h20"/>
                 </svg>
