@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.ui_components import render_profile_menu
 
 st.set_page_config(page_title="Cloud Connect | TEJUSKA", layout="wide")
 
@@ -13,8 +14,8 @@ with st.sidebar:
 
 # ---------- Dynamic CSS ----------
 if st.session_state.theme == "dark":
-    bg_color = "#0B1120"
-    text_color = "#F1F5F9"
+    bg_color = "#0F172A"
+    text_color = "#F8FAFC"
     secondary_bg = "#1E293B"
     primary_color = "#818CF8"
     accent_success = "#10B981"
@@ -33,10 +34,10 @@ else:
 
 st.markdown(f"""
 <style>
-    /* Copy the full CSS block from app.py here (with variables) */
+    /* Copy the full CSS block from app.py (with variables) */
     #MainMenu, footer, header {{visibility: hidden;}}
     .stApp {{ background-color: {bg_color}; color: {text_color}; }}
-    h1, h2, h3 {{ font-weight: 700; letter-spacing: -0.02em; }}
+    h1, h2, h3, h4, h5, h6, p, li, .stMarkdown {{ color: {text_color} !important; }}
     h1 {{ background: linear-gradient(135deg, {primary_color} 0%, #A78BFA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }}
     .stButton button {{ border-radius: 8px; font-weight: 600; transition: all 0.2s ease; border: none; background: linear-gradient(135deg, {primary_color}, #818CF8); color: white; box-shadow: {card_shadow}; }}
     .stButton button:hover {{ transform: translateY(-2px); box-shadow: 0 10px 15px -3px {primary_color}80; }}
@@ -44,11 +45,11 @@ st.markdown(f"""
     .stButton button[kind="secondary"]:hover {{ background: {primary_color}; color: white; }}
     div[data-testid="metric-container"] {{ background: {secondary_bg}; border-radius: 16px; padding: 1.5rem 1rem; box-shadow: {card_shadow}; border: 1px solid {border_color}; transition: all 0.2s; }}
     div[data-testid="metric-container"]:hover {{ box-shadow: 0 20px 25px -5px {primary_color}40; border-color: {primary_color}; }}
-    label[data-testid="stMetricLabel"] {{ font-size: 0.9rem; font-weight: 500; color: {text_color}; opacity: 0.8; }}
+    label[data-testid="stMetricLabel"] {{ font-size: 0.9rem; font-weight: 500; color: {text_color} !important; opacity: 0.8; }}
     .stDataFrame {{ border-radius: 12px; overflow: hidden; border: 1px solid {border_color}; }}
-    .stDataFrame table {{ font-size: 0.9rem; color: {text_color}; }}
+    .stDataFrame table {{ font-size: 0.9rem; color: {text_color} !important; }}
     .stDataFrame th {{ background: linear-gradient(135deg, {primary_color}, #A78BFA); color: white; font-weight: 600; padding: 0.75rem !important; }}
-    .stDataFrame td {{ padding: 0.6rem !important; border-bottom: 1px solid {border_color}; background: {secondary_bg}; }}
+    .stDataFrame td {{ padding: 0.6rem !important; border-bottom: 1px solid {border_color}; background: {secondary_bg}; color: {text_color} !important; }}
     .stDataFrame tr:hover td {{ background-color: {primary_color}20; }}
     .status-active, .status-inactive {{ display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }}
     .status-active {{ background: {accent_success}; box-shadow: 0 0 0 2px {accent_success}40; }}
@@ -70,6 +71,9 @@ st.markdown(f"""
     .css-1d391kg, .css-1wrcr25 {{ background-color: {secondary_bg}; }}
 </style>
 """, unsafe_allow_html=True)
+
+# ---------- Global profile menu ----------
+render_profile_menu()
 
 if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page.")
