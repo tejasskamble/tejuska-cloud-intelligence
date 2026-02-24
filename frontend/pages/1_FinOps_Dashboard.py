@@ -20,17 +20,14 @@ with st.sidebar:
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-wrapper_class = "bg-slate-50 text-slate-900" if st.session_state.theme == "light" else "bg-slate-900 text-slate-50"
-st.markdown(f'<div class="{wrapper_class} min-h-screen p-6">', unsafe_allow_html=True)
-
 render_profile_menu(st.session_state.theme)
 
 if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page to access this section.")
     st.stop()
 
-st.markdown('<h1 class="text-3xl font-bold">FinOps Dashboard</h1>', unsafe_allow_html=True)
-st.markdown('<p class="opacity-70">Real-time multi-cloud cost visibility across AWS, GCP, and Azure — standardised to the FOCUS 1.1 specification.</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">FinOps Dashboard</h1>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300">Real-time multi-cloud cost visibility across AWS, GCP, and Azure — standardised to the FOCUS 1.1 specification.</p>', unsafe_allow_html=True)
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
@@ -44,7 +41,7 @@ with col4:
 
 st.markdown('<hr class="my-6 border-slate-300 dark:border-slate-700">', unsafe_allow_html=True)
 
-st.markdown('<h2 class="text-xl font-semibold">Cost by Cloud Provider</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">Cost by Cloud Provider</h2>', unsafe_allow_html=True)
 sample_data = pd.DataFrame({
     "Provider": ["AWS", "GCP", "Azure"],
     "Billed Cost": [7800.25, 2900.10, 1640.15],
@@ -53,14 +50,14 @@ fig = px.bar(sample_data, x="Provider", y="Billed Cost", color="Provider", label
 fig.update_layout(showlegend=False)
 st.plotly_chart(fig, use_container_width=True)
 
-st.markdown('<h2 class="text-xl font-semibold mt-6">Daily Spend Trend (Last 30 Days)</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="text-xl font-semibold mt-6 text-slate-900 dark:text-slate-50">Daily Spend Trend (Last 30 Days)</h2>', unsafe_allow_html=True)
 dates = pd.date_range(end=pd.Timestamp.today(), periods=30, freq="D")
 costs = (pd.Series(range(30)).apply(lambda x: 380 + (x % 7) * 45 + (x % 3) * 20))
 trend_df = pd.DataFrame({"Date": dates, "Cost (USD)": costs})
 fig2 = px.line(trend_df, x="Date", y="Cost (USD)", template="plotly_white")
 st.plotly_chart(fig2, use_container_width=True)
 
-st.markdown('<h2 class="text-xl font-semibold mt-6">Top Services by Spend</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="text-xl font-semibold mt-6 text-slate-900 dark:text-slate-50">Top Services by Spend</h2>', unsafe_allow_html=True)
 services_df = pd.DataFrame({
     "Service": ["Amazon EC2", "Amazon S3", "Cloud Run", "Cloud SQL", "Azure VMs"],
     "Provider": ["AWS", "AWS", "GCP", "GCP", "Azure"],
@@ -68,5 +65,3 @@ services_df = pd.DataFrame({
     "% of Total": ["34.1%", "9.7%", "7.9%", "6.2%", "5.2%"],
 })
 st.dataframe(services_df, use_container_width=True, hide_index=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
