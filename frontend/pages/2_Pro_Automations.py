@@ -21,6 +21,18 @@ if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page.")
     st.stop()
 
+# ---------- RBAC Protection ----------
+if st.session_state.get("role") == "Developer":
+    st.markdown(
+        """
+        <div class="p-4 mb-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200" role="alert">
+            <span class="font-medium">Access Denied</span> – This page is restricted to Admins only.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.stop()
+
 st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">Agentic Auto-Kill & Thresholds</h1>', unsafe_allow_html=True)
 st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300">Set custom budget limits. The Agentic AI will automatically terminate resources and send email alerts if costs exceed your threshold.</p>', unsafe_allow_html=True)
 
@@ -30,7 +42,6 @@ with col1:
     st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">1. Set Budget Threshold</h2>', unsafe_allow_html=True)
     st.info("Configure the maximum allowed cost for a specific cloud resource.")
     with st.form("threshold_form"):
-        # Provider icon with Tailwind (custom HTML – no wrapping of the selectbox)
         st.markdown(
             f"""
             <div class="flex items-center gap-2 mb-2 text-slate-900 dark:text-slate-50">
@@ -58,7 +69,6 @@ with col1:
 
 with col2:
     st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">2. Simulate Cloud Billing (Test)</h2>', unsafe_allow_html=True)
-    # Custom warning box with proper light/dark colors
     st.markdown(
         """
         <div class="p-4 mb-4 text-sm text-yellow-900 bg-yellow-100 rounded-lg dark:bg-yellow-900 dark:text-yellow-100" role="alert">
@@ -81,3 +91,22 @@ with col2:
                 st.success("Email notification dispatched via SMTP.")
             else:
                 st.success("Cost is within limits. No action taken.")
+
+# ---------- New Real-Time Anomaly Detection Section ----------
+st.markdown('<hr class="my-6 border-slate-300 dark:border-slate-700">', unsafe_allow_html=True)
+st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">Real-Time Anomaly Detection</h2>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300 mb-4">Configure automatic alerts for cost spikes.</p>', unsafe_allow_html=True)
+
+with st.form("anomaly_form"):
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        spike_threshold = st.number_input("Cost Spike Threshold (%)", min_value=1, max_value=100, value=15)
+    with col_b:
+        alert_channel = st.selectbox("Alert Channel", ["Email", "Telegram", "Slack"])
+    with col_c:
+        monitoring_enabled = st.checkbox("Enable 24/7 Monitoring", value=True)
+
+    submit_anomaly = st.form_submit_button("Save Anomaly Settings", type="primary", use_container_width=True)
+
+if submit_anomaly:
+    st.success(f"Anomaly detection enabled with {spike_threshold}% spike threshold via {alert_channel}. 24/7 monitoring: {'ON' if monitoring_enabled else 'OFF'}")
