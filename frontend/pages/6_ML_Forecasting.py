@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from utils.ui_components import inject_tailwind, get_theme_css, render_profile_menu, metric_card
+from utils.sidebar import render_bottom_profile
 
 st.set_page_config(page_title="Predictive Cost Analytics | TEJUSKA", layout="wide")
 
@@ -15,6 +16,7 @@ with st.sidebar:
     st.markdown("## Appearance")
     dark_mode = st.toggle("Dark mode", value=(st.session_state.theme == "dark"))
     st.session_state.theme = "dark" if dark_mode else "light"
+    render_bottom_profile()
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
