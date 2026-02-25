@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from utils.ui_components import inject_tailwind, get_theme_css, render_profile_menu
+from utils.sidebar import render_bottom_profile
 
 st.set_page_config(page_title="Kubernetes FinOps | TEJUSKA", layout="wide")
 
@@ -13,6 +14,7 @@ with st.sidebar:
     st.markdown("## Appearance")
     dark_mode = st.toggle("Dark mode", value=(st.session_state.theme == "dark"))
     st.session_state.theme = "dark" if dark_mode else "light"
+    render_bottom_profile()
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
@@ -23,65 +25,51 @@ if not st.session_state.get("authenticated"):
     st.stop()
 
 st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">Kubernetes Cluster Cost Optimization</h1>', unsafe_allow_html=True)
-st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300 mb-6">Deep dive into pod‑level and node‑level cost allocations across EKS, AKS, and GKE.</p>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300 mb-6">Deep dive into pod-level and node-level cost allocations across EKS, AKS, and GKE.</p>', unsafe_allow_html=True)
 
 # Tabs
 tab1, tab2, tab3 = st.tabs(["Namespace Cost", "Idle Pods", "Node Utilization"])
 
 with tab1:
-    st.markdown('<h2 class="text-lg font-semibold text-slate-900 dark:text-slate-50">Cost by Namespace</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-4">Namespace Cost Breakdown</h2>', unsafe_allow_html=True)
     namespace_data = pd.DataFrame({
-        "Namespace": ["prod-payment-service", "dev-frontend", "prod-backend-api", "staging-cache", "data-ml"],
-        "Cluster": ["eks-prod", "aks-dev", "gke-prod", "eks-staging", "gke-ml"],
-        "Monthly Cost ($)": [2450, 380, 1760, 220, 890],
-        "CPU Usage (cores)": [12, 2, 8, 1, 4],
-        "Memory Usage (GB)": [48, 8, 32, 4, 16]
+        "Namespace": ["prod-payment-service", "dev-frontend", "prod-auth-service", "staging-backend", "monitoring"],
+        "Cluster": ["eks-prod", "eks-dev", "aks-prod", "gke-staging", "eks-prod"],
+        "CPU Cost ($)": [1240, 320, 890, 210, 150],
+        "Memory Cost ($)": [860, 180, 570, 130, 220],
+        "Total Cost ($)": [2100, 500, 1460, 340, 370]
     })
-    st.dataframe(namespace_data, use_container_width=True, hide_index=True,
-                 column_config={"Monthly Cost ($)": st.column_config.NumberColumn(format="$%.0f")})
+    st.dataframe(namespace_data, use_container_width=True, hide_index=True)
 
 with tab2:
-    st.markdown('<h2 class="text-lg font-semibold text-slate-900 dark:text-slate-50">Over‑provisioned / Idle Pods</h2>', unsafe_allow_html=True)
-    idle_pods = pd.DataFrame({
-        "Pod Name": ["payment-service-7b9f6", "frontend-5c4d8", "cache-redis-2f3a1", "ml-inference-9e7b2"],
-        "Namespace": ["prod", "dev", "staging", "data"],
-        "Requested CPU": [4, 2, 1, 8],
-        "Actual CPU (avg)": [0.3, 0.1, 0.05, 1.2],
-        "Wasted Cost ($/mo)": [185, 42, 18, 320]
-    })
-    st.dataframe(idle_pods, use_container_width=True, hide_index=True,
-                 column_config={"Wasted Cost ($/mo)": st.column_config.NumberColumn(format="$%.0f")})
-
+    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-4">Idle / Over‑Provisioned Pods</h2>', unsafe_allow_html=True)
     st.markdown(
         """
-        <div class="p-4 mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg">
-            <p class="text-amber-800 dark:text-amber-200 text-sm">⚠️ Idle resources are costing you approximately $565/month.</p>
+        <div class="p-4 mb-4 text-sm text-amber-800 bg-amber-100 rounded-lg dark:bg-amber-900 dark:text-amber-200" role="alert">
+            <span class="font-medium">Warning:</span> 8 pods have been running with CPU usage below 5% for over 24 hours.
         </div>
         """,
         unsafe_allow_html=True,
     )
+    idle_pods = pd.DataFrame({
+        "Pod Name": ["frontend-7d8f9c", "redis-cache-2b3k", "sidecar-injector", "logging-agent", "old-worker"],
+        "Namespace": ["dev-frontend", "dev-cache", "prod-mesh", "monitoring", "staging"],
+        "Requested CPU": ["2 cores", "1 core", "0.5 core", "1 core", "4 cores"],
+        "Actual CPU (avg)": ["0.08 cores", "0.02 cores", "0.03 cores", "0.1 cores", "0.2 cores"],
+        "Monthly Waste ($)": [85, 42, 18, 38, 210]
+    })
+    st.dataframe(idle_pods, use_container_width=True, hide_index=True)
 
-    if st.button("Scale Down Selected Deployments", type="primary", use_container_width=True):
-        st.success("Scaling down requested. Idle pods will be reduced, estimated savings: $450/month.")
+    if st.button("Scale Down Deployments", type="primary"):
+        st.success("Initiating scale-down for idle pods... (simulated)")
 
 with tab3:
-    st.markdown('<h2 class="text-lg font-semibold text-slate-900 dark:text-slate-50">Node Utilization</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-4">Node Utilization</h2>', unsafe_allow_html=True)
     node_data = pd.DataFrame({
-        "Node Name": ["ip-10-0-1-23", "ip-10-0-2-45", "ip-10-0-3-67", "aks-node-123", "gke-node-456"],
-        "Instance Type": ["m5.large", "c5.xlarge", "r5.large", "Standard_D4s_v3", "n2-standard-4"],
-        "CPU Utilization %": [68, 92, 45, 81, 37],
-        "Memory Utilization %": [72, 88, 51, 79, 42],
-        "Monthly Cost": [85, 170, 95, 130, 150]
+        "Node Name": ["ip-10-1-1-1", "ip-10-1-1-2", "ip-10-1-1-3", "aks-np-123", "gke-node-001"],
+        "Instance Type": ["m5.large", "m5.xlarge", "c5.2xlarge", "Standard_D4s_v3", "e2-standard-4"],
+        "CPU Util %": [78, 92, 45, 33, 67],
+        "Memory Util %": [65, 88, 52, 28, 71],
+        "Monthly Cost ($)": [185, 370, 520, 290, 410]
     })
-    st.dataframe(node_data, use_container_width=True, hide_index=True,
-                 column_config={"Monthly Cost": st.column_config.NumberColumn(format="$%.0f")})
-
-    # Add a recommendation card
-    st.markdown(
-        """
-        <div class="p-4 mt-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-            <p class="text-emerald-800 dark:text-emerald-200 text-sm">💡 Two nodes are underutilized. Consider rightsizing or bin packing to save ~$200/month.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.dataframe(node_data, use_container_width=True, hide_index=True)
