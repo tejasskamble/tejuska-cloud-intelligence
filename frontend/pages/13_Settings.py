@@ -13,8 +13,7 @@ with st.sidebar:
     st.markdown("## Appearance")
     dark_mode = st.toggle("Dark mode", value=(st.session_state.theme == "dark"))
     st.session_state.theme = "dark" if dark_mode else "light"
-    # Other sidebar items can go here...
-    render_bottom_profile()  # <-- always last
+    render_bottom_profile()
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
