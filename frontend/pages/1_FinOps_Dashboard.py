@@ -81,12 +81,44 @@ services_df = pd.DataFrame({
 })
 st.dataframe(services_df, use_container_width=True, hide_index=True)
 
-# ---------- NEW: AI-Powered Optimization Recommendations ----------
+# ---------- NEW: Chargeback / Showback ----------
+st.markdown('<hr class="my-6 border-slate-300 dark:border-slate-700">', unsafe_allow_html=True)
+st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">Cost Allocation (Chargeback / Showback)</h2>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300 mb-4">Department‑wise cost distribution for the current month.</p>', unsafe_allow_html=True)
+
+# Dummy department data
+dept_data = pd.DataFrame({
+    "Department": ["Engineering", "QA/Testing", "Marketing", "Data Science"],
+    "Cost": [6250, 3400, 1850, 920],
+    "Color": ["#6366F1", "#F59E0B", "#10B981", "#EF4444"]
+})
+
+# Plotly bar chart
+fig3 = px.bar(dept_data, x="Department", y="Cost", color="Department",
+              color_discrete_sequence=dept_data["Color"],
+              labels={"Cost": "Cost (USD)"}, template="plotly_white")
+fig3.update_layout(showlegend=False)
+st.plotly_chart(fig3, use_container_width=True)
+
+# Summary card for highest spike
+highest_dept = "Engineering"
+spike_pct = 12.5
+st.markdown(
+    f"""
+    <div class="p-4 mt-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+        <p class="text-sm text-slate-500 dark:text-slate-400">Highest cost spike this week</p>
+        <p class="text-xl font-bold text-slate-900 dark:text-slate-50">{highest_dept} <span class="text-amber-600 dark:text-amber-400 text-sm">+{spike_pct}%</span></p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Increase due to new dev environments in us-east-1</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ---------- AI-Powered Optimization Recommendations ----------
 st.markdown('<hr class="my-6 border-slate-300 dark:border-slate-700">', unsafe_allow_html=True)
 st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">AI-Powered Optimization Recommendations</h2>', unsafe_allow_html=True)
 st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300 mb-4">Zombie resources detected – idle or unattached assets that can be safely terminated.</p>', unsafe_allow_html=True)
 
-# Simulated zombie resources data
 zombie_data = pd.DataFrame({
     "Resource ID": ["vol-0a1b2c3d4e5f67890", "i-1234567890abcdef0", "eipalloc-0123456789abcdef"],
     "Type": ["EBS Volume (gp2, 100GB)", "EC2 t3.micro", "Elastic IP"],
@@ -104,13 +136,12 @@ st.dataframe(
     }
 )
 
-# Termination button with custom red styling
 col_btn1, _ = st.columns([1, 3])
 with col_btn1:
     if st.button("Terminate Selected Idle Resources (Save $450/mo)", key="terminate_btn", use_container_width=True):
         st.success("Selected resources have been terminated. Estimated savings: $450/month.")
 
-# Add custom CSS to make the button red (warning style)
+# Optional styling for red button
 st.markdown(
     """
     <style>
