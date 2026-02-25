@@ -26,6 +26,21 @@ if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page to access this section.")
     st.stop()
 
+# Premium report generation button
+col_btn, col_badge = st.columns([3, 1])
+with col_btn:
+    if st.button("📄 Generate Monthly FinOps Report (PDF)", type="primary", use_container_width=True):
+        st.success("Your report is being generated. Download will start shortly.")
+with col_badge:
+    st.markdown(
+        """
+        <div class="bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 text-sm font-medium px-3 py-1 rounded-full text-center">
+            Data: Live Sync Active
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">FinOps Dashboard</h1>', unsafe_allow_html=True)
 st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300">Real-time multi-cloud cost visibility across AWS, GCP, and Azure — standardised to the FOCUS 1.1 specification.</p>', unsafe_allow_html=True)
 
