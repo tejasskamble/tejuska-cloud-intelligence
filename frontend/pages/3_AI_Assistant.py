@@ -1,6 +1,5 @@
 import streamlit as st
 import time
-import random
 from utils.ui_components import inject_tailwind, get_theme_css, render_profile_menu
 
 st.set_page_config(page_title="AI Assistant | TEJUSKA", layout="wide")
@@ -23,84 +22,63 @@ if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page.")
     st.stop()
 
-st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">OPTIC FinOps AI Assistant – Gemini Ultra Mode</h1>', unsafe_allow_html=True)
-st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300">Chat freely with your multi-cloud FinOps assistant. Ask anything, and it will respond like a full AI expert, maintaining context and giving advice.</p>', unsafe_allow_html=True)
-
+# Initialize chat history
 if "chat_messages" not in st.session_state:
-    st.session_state.chat_messages = []
+    st.session_state.chat_messages = [
+        {"role": "assistant", "content": "Hello Admin, I am your Tejuska FinOps Agent. I can analyze cost spikes or optimize your DevOps pipelines. How can I help?"}
+    ]
 
-if "thresholds" not in st.session_state:
-    st.session_state.thresholds = {}
+# Page title
+st.markdown('<h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">FinOps GenAI Assistant</h1>', unsafe_allow_html=True)
+st.markdown('<p class="opacity-70 text-slate-700 dark:text-slate-300 mb-6">Your intelligent copilot for cloud cost optimization.</p>', unsafe_allow_html=True)
 
-col1, col2 = st.columns([1, 2])
-
+# Quick prompts – Tailwind-styled buttons (using st.button for functionality)
+st.markdown('<p class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Quick prompts:</p>', unsafe_allow_html=True)
+col1, col2, col3 = st.columns(3)
 with col1:
-    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">Agentic Budget Thresholds</h2>', unsafe_allow_html=True)
-    with st.form("threshold_form"):
-        st.markdown(
-            f"""
-            <div class="flex items-center gap-2 mb-2 text-slate-900 dark:text-slate-50">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 2v20M2 12h20"/>
-                </svg>
-                <span class="font-semibold">Cloud Provider</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        provider = st.selectbox("", ["AWS", "Azure", "GCP", "Other"], label_visibility="collapsed")
-        resource_id = st.text_input("Resource ID", placeholder="e.g., i-09ca51ce7bcd242ed")
-        threshold = st.number_input("Cost Threshold ($)", min_value=0.01, value=1.0, step=0.5)
-        user_email = st.text_input("Alert Email", value=st.session_state.get("tenant_id", ""))
-
-        submit_threshold = st.form_submit_button("Activate Agentic Shield", type="primary")
-        if submit_threshold:
-            if resource_id:
-                st.session_state.thresholds[resource_id] = {"provider": provider, "limit": threshold, "email": user_email}
-                st.success(f"Shield Activated! {provider} resource '{resource_id}' will be monitored and alerts sent to {user_email} if cost exceeds ${threshold:.2f}.")
-            else:
-                st.error("Enter a valid Resource ID!")
-
-with col2:
-    st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">Gemini-Style AI Chat (Simulation Mode)</h2>', unsafe_allow_html=True)
-
-    for message in st.session_state.chat_messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    if user_query := st.chat_input("Talk freely with your FinOps AI..."):
-        st.session_state.chat_messages.append({"role": "user", "content": user_query})
-        with st.chat_message("user"):
-            st.markdown(user_query)
-
+    if st.button("Analyze yesterday's AWS spike", key="q1", use_container_width=True):
+        st.session_state.chat_messages.append({"role": "user", "content": "Analyze yesterday's AWS spike"})
+        # Simulate response
         with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            with st.spinner("Thinking like Gemini AI..."):
+            with st.spinner("Thinking..."):
                 time.sleep(1)
-                # Simulate AI response
-                dynamic_responses = [
-                    f"Hey! Regarding '{user_query}', your multi-cloud setup seems optimized. Have you checked automated shields?",
-                    f"I see your question: '{user_query}'. AWS, Azure, and GCP resources are under monitoring. I recommend reviewing ABACUS policies.",
-                    f"Analyzing '{user_query}'... your current thresholds look good, but consider adding alerts for critical resources.",
-                    f"Regarding '{user_query}', multi-cloud efficiency is high. Generating SQL insights could help further optimization.",
-                    f"Interesting query '{user_query}'. Your infrastructure is stable. Setting proactive cost alerts is suggested."
-                ]
-                full_response = random.choice(dynamic_responses)
+            response = "I've analyzed the AWS cost spike. It appears to be caused by a new EC2 instance type in us-east-1. You could save ~$320 by switching to reserved instances."
+            st.session_state.chat_messages.append({"role": "assistant", "content": response})
+        st.rerun()
+with col2:
+    if st.button("Find idle resources", key="q2", use_container_width=True):
+        st.session_state.chat_messages.append({"role": "user", "content": "Find idle resources"})
+        with st.chat_message("assistant"):
+            with st.spinner("Scanning..."):
+                time.sleep(1.5)
+            response = "I found 3 idle resources: an unattached EBS volume (gp2, 100GB) in eu-west-1, an idle t3.micro EC2 instance running for 7 days with <1% CPU, and an unused elastic IP. Terminating them could save $87/month."
+            st.session_state.chat_messages.append({"role": "assistant", "content": response})
+        st.rerun()
+with col3:
+    if st.button("Optimize dev pipeline", key="q3", use_container_width=True):
+        st.session_state.chat_messages.append({"role": "user", "content": "Optimize dev pipeline"})
+        with st.chat_message("assistant"):
+            with st.spinner("Analyzing pipeline..."):
+                time.sleep(2)
+            response = "Your CI/CD pipeline uses on-demand runners. Switching to spot instances for non‑production jobs could reduce costs by 60‑70%. Estimated monthly saving: $210."
+            st.session_state.chat_messages.append({"role": "assistant", "content": response})
+        st.rerun()
 
-                streamed_text = ""
-                for word in full_response.split():
-                    streamed_text += word + " "
-                    message_placeholder.markdown(streamed_text + "▌")
-                    time.sleep(0.02)
-                message_placeholder.markdown(full_response)
+# Display chat history
+for msg in st.session_state.chat_messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-            st.session_state.chat_messages.append({"role": "assistant", "content": full_response})
+# Chat input
+if prompt := st.chat_input("Ask me anything about your cloud costs..."):
+    st.session_state.chat_messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-with st.expander("View Active Thresholds"):
-    if st.session_state.thresholds:
-        for rid, info in st.session_state.thresholds.items():
-            st.write(f"{rid}: {info}")
-    else:
-        st.write("No thresholds set yet.")
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            time.sleep(1.5)
+        # Simulate varied response
+        response = f"Regarding '{prompt}': I've analyzed your recent usage. Consider reviewing your DevOps pipelines for rightsizing opportunities. Would you like a detailed report?"
+        st.markdown(response)
+        st.session_state.chat_messages.append({"role": "assistant", "content": response})
