@@ -30,7 +30,7 @@ with col1:
     st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">1. Set Budget Threshold</h2>', unsafe_allow_html=True)
     st.info("Configure the maximum allowed cost for a specific cloud resource.")
     with st.form("threshold_form"):
-        # Provider icon with Tailwind (custom HTML)
+        # Provider icon with Tailwind (custom HTML – no wrapping of the selectbox)
         st.markdown(
             f"""
             <div class="flex items-center gap-2 mb-2 text-slate-900 dark:text-slate-50">
@@ -58,7 +58,7 @@ with col1:
 
 with col2:
     st.markdown('<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">2. Simulate Cloud Billing (Test)</h2>', unsafe_allow_html=True)
-    # Fixed warning box with proper light/dark colors
+    # Custom warning box with proper light/dark colors
     st.markdown(
         """
         <div class="p-4 mb-4 text-sm text-yellow-900 bg-yellow-100 rounded-lg dark:bg-yellow-900 dark:text-yellow-100" role="alert">
