@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.ui_components import inject_tailwind, get_theme_css, render_profile_menu
+from utils.ui_components import inject_tailwind, get_theme_css
 from utils.sidebar import render_bottom_profile
 
 st.set_page_config(page_title="Settings | TEJUSKA", layout="wide")
@@ -16,8 +16,6 @@ with st.sidebar:
     render_bottom_profile()
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
-
-render_profile_menu(st.session_state.theme)
 
 if not st.session_state.get("authenticated"):
     st.warning("Please sign in from the Home page.")
