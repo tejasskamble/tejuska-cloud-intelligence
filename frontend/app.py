@@ -25,11 +25,15 @@ with st.sidebar:
 # ---------- Inject dynamic CSS based on theme ----------
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-# ---------- Session state ----------
+# ---------- Session state initialization ----------
+# Ensure all required keys exist
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.tenant_id = ""
     st.session_state.role = None
+
+# Initialize forgot_password_step separately (even if authenticated exists)
+if "forgot_password_step" not in st.session_state:
     st.session_state.forgot_password_step = None  # None, 'otp', 'reset'
 
 # ---------- Authentication UI ----------
