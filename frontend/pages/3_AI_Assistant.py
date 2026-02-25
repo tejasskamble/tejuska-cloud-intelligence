@@ -79,7 +79,7 @@ with col2:
             full_response = ""
             with st.spinner("Thinking like Gemini AI..."):
                 time.sleep(1)
-                context = " ".join([m["content"] for m in st.session_state.chat_messages[-5:]])
+                # Simulate AI response
                 dynamic_responses = [
                     f"Hey! Regarding '{user_query}', your multi-cloud setup seems optimized. Have you checked automated shields?",
                     f"I see your question: '{user_query}'. AWS, Azure, and GCP resources are under monitoring. I recommend reviewing ABACUS policies.",
