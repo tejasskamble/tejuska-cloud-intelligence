@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.ui_components import inject_tailwind, get_theme_css, render_profile_menu, status_indicator
+from utils.ui_components import inject_tailwind, get_theme_css, status_indicator
 from utils.sidebar import render_bottom_profile
 
 st.set_page_config(page_title="Cloud Connect | TEJUSKA", layout="wide")
@@ -18,13 +18,12 @@ with st.sidebar:
 
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
-render_profile_menu(st.session_state.theme)
-
-# Initialize session state for authentication and role
+# Initialize session state for authentication, role, and forgot password flow
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.tenant_id = ""
     st.session_state.role = None
+    st.session_state.forgot_password_step = None  # None, 'otp', 'reset'
 
 # ---------- AUTHENTICATION SECTION (shown only when not authenticated) ----------
 if not st.session_state.authenticated:
@@ -42,7 +41,7 @@ if not st.session_state.authenticated:
     tab1, tab2 = st.tabs(["Sign In", "Sign Up"])
 
     with tab1:
-        # Google & GitHub buttons (exact HTML as requested)
+        # Google & GitHub buttons (exact HTML)
         st.markdown(
             """
             <div class="flex w-full gap-4 mb-6 mt-4">
@@ -59,17 +58,51 @@ if not st.session_state.authenticated:
             unsafe_allow_html=True,
         )
 
-        with st.form("signin_form"):
-            email = st.text_input("Email *", placeholder="name@company.com")
-            password = st.text_input("Password *", type="password", placeholder="········")
-            if st.form_submit_button("Sign In", type="primary", use_container_width=True):
-                if email and password and "@" in email:
-                    st.session_state.authenticated = True
-                    st.session_state.tenant_id = email
-                    st.session_state.role = "Admin"  # Default role for demo
+        # Forgot password flow
+        if st.session_state.forgot_password_step is None:
+            with st.form("signin_form"):
+                email = st.text_input("Email *", placeholder="name@company.com")
+                password = st.text_input("Password *", type="password", placeholder="········")
+                col_forgot, _ = st.columns([1, 3])
+                with col_forgot:
+                    forgot_clicked = st.form_submit_button("Forgot Password?", type="secondary")
+                if st.form_submit_button("Sign In", type="primary", use_container_width=True):
+                    if email and password and "@" in email:
+                        st.session_state.authenticated = True
+                        st.session_state.tenant_id = email
+                        st.session_state.role = "Admin"  # Default role for demo
+                        st.rerun()
+                    else:
+                        st.error("Please enter a valid email and password.")
+                if forgot_clicked:
+                    st.session_state.forgot_password_step = "otp"
                     st.rerun()
-                else:
-                    st.error("Please enter a valid email and password.")
+
+        elif st.session_state.forgot_password_step == "otp":
+            st.info("A 6-digit OTP has been sent to your registered Email and Mobile.")
+            with st.form("otp_form"):
+                otp = st.text_input("Enter 6-Digit OTP", max_chars=6)
+                if st.form_submit_button("Verify OTP", type="primary", use_container_width=True):
+                    if otp and len(otp) == 6 and otp.isdigit():
+                        st.session_state.forgot_password_step = "reset"
+                        st.rerun()
+                    else:
+                        st.error("Invalid OTP. Please enter a 6-digit code.")
+
+        elif st.session_state.forgot_password_step == "reset":
+            with st.form("reset_password_form"):
+                new_password = st.text_input("New Password", type="password")
+                retype_new = st.text_input("Re-type New Password", type="password")
+                if st.form_submit_button("Reset Password", type="primary", use_container_width=True):
+                    if new_password and retype_new:
+                        if new_password == retype_new:
+                            st.success("Password reset successfully! Please Sign In.")
+                            st.session_state.forgot_password_step = None
+                            st.rerun()
+                        else:
+                            st.error("Passwords do not match.")
+                    else:
+                        st.error("Please fill both fields.")
 
     with tab2:
         with st.form("signup_form"):
