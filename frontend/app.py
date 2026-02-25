@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.ui_components import inject_tailwind, get_theme_css, render_profile_menu
+from utils.sidebar import render_bottom_profile
 
 st.set_page_config(
     page_title="TEJUSKA Cloud Intelligence",
@@ -18,6 +19,8 @@ with st.sidebar:
     st.markdown("## Appearance")
     dark_mode = st.toggle("Dark mode", value=(st.session_state.theme == "dark"))
     st.session_state.theme = "dark" if dark_mode else "light"
+    # ---------- Bottom profile ----------
+    render_bottom_profile()
 
 # ---------- Inject dynamic CSS based on theme ----------
 st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
@@ -54,6 +57,7 @@ if not st.session_state.authenticated:
                 if email and password and "@" in email:
                     st.session_state.authenticated = True
                     st.session_state.tenant_id = email
+                    st.session_state.role = "Admin"  # Default role
                     st.rerun()
                 else:
                     st.error("Please enter a valid email and password.")
@@ -64,6 +68,7 @@ if not st.session_state.authenticated:
             last_name = st.text_input("Last Name *", placeholder="Doe")
             contact = st.text_input("Contact Number *", placeholder="+1234567890")
             email = st.text_input("Email *", placeholder="john.doe@company.com")
+            role = st.selectbox("Select Role *", ["Admin", "Developer"])
             set_password = st.text_input("Set Password *", type="password", placeholder="········")
             retype_password = st.text_input("Re-type Password *", type="password", placeholder="········")
             submitted = st.form_submit_button("Create Account", type="primary", use_container_width=True)
@@ -75,10 +80,12 @@ if not st.session_state.authenticated:
                 elif set_password != retype_password:
                     st.error("Passwords do not match!")
                 else:
-                    # Simulate successful registration
-                    st.success("Account created! Please sign in.")
+                    st.session_state.authenticated = True
+                    st.session_state.tenant_id = email
+                    st.session_state.role = role
+                    st.rerun()
 
-    # OAuth buttons – exact HTML as requested
+    # OAuth buttons (exact HTML)
     st.markdown(
         """
         <div class="flex w-full gap-4 mb-6 mt-4">
@@ -104,4 +111,5 @@ else:
     if st.button("Sign Out", type="secondary"):
         st.session_state.authenticated = False
         st.session_state.tenant_id = ""
+        st.session_state.role = None
         st.rerun()
